@@ -3,12 +3,16 @@
 #Modified by C. Proffitt, August/September, 2017
 #based on IDL routines written by Charles Proffitt in Jan 2017
 #
-#This module is written in Python 3.6.1
+#This module is written for Python 3.6.1
+#Some limited testing appears to show that it also works with Python 2.7.13
 #
 #This module contains required functions for the following scripts:
 #
 #This module requires:
 #numpy, scipy, astropy, matplotlib, lmfit, time
+# LMFIT is not in the standard astroconda distribution,
+# but can be added to an anaconda environment by doing:
+# conda install -c conda-forge lmfit
 #
 #NOTE: requires at least numpy 1.13, bugs occur with numpy 1.12
 #
