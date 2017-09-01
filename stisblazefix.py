@@ -271,19 +271,57 @@ def findshift(filedata, guess, iterate=True):
     
 
 def fluxfix(files, pdfname, guess=None, iterate=True, **kwargs):#add optional arguments for plotting, eg. files is a list of x1d fits spectra
-    '''Corrects a list of echelle spectra by aligning the spectral orders.
+    '''Corrects STIS echelle spectra by aligning the sensitvity function to 
+    compensate for shifts in the blaze function.
     
-    Take a list of x1d fits files, and for each spectrum find the shift to the blaze 
-    function that best aligns the orders in the spectrum, recalculate the flux with that
-    blaze function, create an x1f fits file with the new flux and error, and generate 
-    a diagnostic plot. This creates a new fits file for each one in files, and one
-    pdf file containing the diagnostic plots.
+    This routine will iterate over a list of STIS echelle x1d files and for each exposure
+    in each file it will find the shifts of the sensitivy curves for the spectral orders 
+    that maximize the flux consistency in the overlap between orders. Corrected flux and 
+    error vectors are then calculated and saved to new output files where '_x1d.fits' is 
+    replaced with '_x1f.fits'.
     
-    files is a list or tuple of x1d fits files.
-    pdfname is the name of the pdf file that will be generated. This name must be unique.
-    guess is the starting parameters for pixshift, in the form (a, b) -> a + b*x 
-    iterate is a Boolean that determines whether fluxfix iterates or only uses the starting guess.
-    Takes keyword arguments.
+    It assumes that amount by which the sensitivity curve for each spectral order 
+    needs to be shifted is a linear function of the order number. The optimal shifts for 
+    each exposure to minimize the flux inconsistency in the overlapping regions of the
+    spectral orders are found. Each exposure is treated independently.
+    
+    Args:
+
+        files (list of str): A list of file names corresponding to STIS echelle x1d files.
+        All file names should end in '_x1d.fits' and should contain extracted and flux
+        calibrated STIS echelle spectra output from CALSTIS.
+
+        pdfname (str): Name for the output pdf file.
+        
+        guess (tuple of two floats): Contains a starting guess for the linear relation 
+        used to shift the blaze function. Should be in the form (a, b), where the blaze 
+        shift for each spectral order x will be a + b*x. Defaults to None which then
+        substitutes a suitable guess supplied in the code.
+
+        Iterate (logical): When set to True the code will iterate to find the values for
+        a & b that minimimize the inconsistency in the flux ovelap regions. When set to 
+        False, the code will use the values supplied in Guess without iterating. Defaults
+        to True.
+    
+    Returns:
+       An array of tuples, one for each exposure found in the x1d files. Each tuple
+       contains:
+          - An array containing the final shift value in pixels for each spectral order in
+          the file.
+          - A two element tuple containing the (a, b) coefficients giving the offset of
+          the lowest spectral order and the change in offset per order. The shift array
+          above should = a + b*i for each element i in the array.
+          - A two element tuple containing the formal errors in a and b found from the 
+          minimization routine.
+          - A string containing the name of the input file
+          - An integer containing the extension number of the input file from which the
+          exposure was taken.
+    
+    Produces:
+       A new copy of each x1d file with the fluxes and errors corrected for the new 
+       shift of the sensitivity vector. The new files replace 'x1d' in the file names
+       with 'x1f'.
+       A multipage pdf file with diagnostic plots for each exposure. 
     '''
     if guess is None:
         guess=(1, 0.5)
