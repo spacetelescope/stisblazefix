@@ -3,15 +3,16 @@
 #Modified by C. Proffitt, August/September, 2017
 #based on IDL routines written by Charles Proffitt in Jan 2017
 #
-#This module is written for Python 3.6.1
-#Some limited testing appears to show that it also works with Python 2.7.13
+#This module is written for Python 3.6.1,
+#although limited testing using Python 2.7.13 shows no problems.
 #
-#This module contains required functions for the following scripts:
 #
 #This module requires:
 #numpy, scipy, astropy, matplotlib, lmfit, time
+
 # LMFIT is not in the standard astroconda distribution,
-# but can be added to an anaconda environment by doing:
+# but can be added to an anaconda environment by first
+# activating the desired environment and then doing
 # conda install -c conda-forge lmfit
 #
 #NOTE: requires at least numpy 1.13, bugs occur with numpy 1.12
@@ -23,6 +24,7 @@
 echelle modes. It is intended for use with x1d fits files. Most users will be interested 
 in the fluxfix function.
 
+#This module contains required functions for the following scripts:
 fluxcorrect takes a shift to the blaze function and recalculates the flux and error.
 residcalc takes an echelle spectrum and calculates the flux residuals for the overlapping region.
 generateplot takes an old and corrected spectrum and generates a diagnostic plot.
@@ -52,8 +54,7 @@ def fluxcorrect(filedata, pixshift):
     pixshift is a 1D vector with length equal to the number of orders in the echelle spectrum.
     It contains the shift of the blaze function in pixels as a function of relative spectral order.
     '''
-    #add checks in main, or here? Probably in here, but could do in both
-    #still need to check for zero division?
+
     origblaze = np.divide(filedata['net'], filedata['flux'])#back out original sensitivity
     shape = np.shape(origblaze)
     newblaze = np.zeros(shape)
@@ -66,7 +67,10 @@ def fluxcorrect(filedata, pixshift):
         newblaze[order] = f(pixnos - pixshift[order])#shifts the blaze function
         order += 1
     newflux = np.divide(filedata['net'], newblaze)
-    newerr = np.divide(filedata['net_error'], newblaze)
+    #newerr = np.divide(filedata['net_error'], newblaze)  # need to handle case where net_error column is missing
+    newerr = np.divide(filedata['error'],filedata['flux'])*newflux
+    isbad = np.where(np.isnan(newerr) | np.isnan(newerr))
+    newerr[isbad] = 0.0
     return (newflux, newerr)
 
 def residcalc(filedata, flux=None, err=None, dq=None, ntrim=5):
@@ -162,7 +166,7 @@ def generateplot(origdata, newflux, newerr, pixshift, oldresids=None, olderr=Non
     origflux = origdata['flux']
     wavelength = origdata['wavelength']
     shape = np.shape(origflux)#(no. orders, no. pixels)
-    yrange=cliprange(origflux,percentile=0.02,pad=0.125)
+    yrange=cliprange(origflux,fraclim=0.02,pad=0.125)
         
     
     if oldresids is None or olderr is None:
@@ -284,19 +288,24 @@ def fluxfix(files, pdfname, guess=None, iterate=True, **kwargs):#add optional ar
         guess=(1, 0.5)
     pdf = PdfPages(pdfname)
     for filename in files:
+        if(filename.find('_x1d.fits') >= 0):
+            basename=filename[0:filename.find('_x1d.fits')]
+        else:
+            basename=filename[0:filename.find('.fit')]
         file = fits.open(filename)
         hdr = file[0].header
         extno = len(file)
         i = 1
         while i < extno:#for i, extension in enumerate(file, start=1):#while i < extno:
             filedata = file[i].data
-            shift = findshift(filedata, guess)
+            hdri = file[i].header
+            shift = findshift(filedata, guess, iterate=iterate)
             pixshift, pixerr, params = shift[0], shift[1], shift[2]
             new = fluxcorrect(filedata, pixshift)
             newflux, newerr = new[0], new[1]
             graph = generateplot(filedata, newflux, newerr, pixshift)
             plt.suptitle(filename[:-9] + ' Extension: ' + str(i))
-            plt.suptitle(hdr['rootname']+' Ext. '+str(i)+' '+hdr['targname']+' '+hdr['opt_elem']+' '+str(hdr['CENWAVE'])+' '+hdr['propaper']+' '+hdr['tdateobs'] )
+            plt.suptitle(hdr['rootname']+' ext. '+str(i)+', '+hdr['targname']+', '+hdr['opt_elem']+' '+str(hdr['CENWAVE'])+' '+hdr['propaper']+', '+'{:.2f}'.format(hdri['exptime'])+'s, '+hdri['date-obs']+' '+hdri['time-obs'] )
 
             plt.tight_layout(rect=[0, 0.03, 1, 0.95])
             pdf.savefig()
@@ -304,7 +313,7 @@ def fluxfix(files, pdfname, guess=None, iterate=True, **kwargs):#add optional ar
             file[i].data['error'] = newerr
             i += 1
         hdr['comment'] = 'Spectra corrected using stisfix on ' + time.strftime('%d/%m/%Y')
-        file.writeto(filename[:-6] + 'f.fits',clobber=True)
+        file.writeto(basename + '_x1f.fits',clobber=True)
         file.close()
     pdf.close()
 
@@ -336,13 +345,17 @@ def plotblaze(filename, pdfname, ntrim=7):
     file.close()
     pdf.close()
 
-def cliprange(vector, percentile=0.05, pad=0.1):
+def cliprange(vector, fraclim=0.02, pad=0.125):
+    ''' For a vector first find the limits, v_0 and v_1, on the value that 
+    includes from fraclim to 1-fraclim of the pixels.
+    Then expand that range on both the lower and upper end by an amount pad*(v_1-v_0)
+    '''
     hist=np.histogram(vector,bins='auto')
     cdist=np.cumsum(hist[0])
     cdist=1.0*cdist/cdist.max()
     centers=0.5*(hist[1][1:]+hist[1][:-1])
     intfunc=interpolate.interp1d(cdist,centers,fill_value='extrapolate')
-    newrange=intfunc([percentile,1-percentile])
+    newrange=intfunc([fraclim,1-fraclim])
     fullrange=newrange[-1]-newrange[0]
     return newrange+pad*np.array([-fullrange,fullrange])
         
