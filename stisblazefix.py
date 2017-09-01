@@ -44,6 +44,7 @@ import matplotlib.gridspec as gridspec
 import matplotlib.text as txt
 from lmfit import Parameters, Minimizer, conf_interval, minimize, printfuncs
 import time
+import ntpath
 
 
 def fluxcorrect(filedata, pixshift):
@@ -266,7 +267,7 @@ def findshift(filedata, guess, iterate=True):
     b = (min.params['b'].value, min.params['b'].stderr)
     pixshift = a[0] + (b[0])*x
     pixerr = np.sqrt(a[1]**2 + (x * b[1])**2)
-    return (pixshift, pixerr, (a, b))
+    return (pixshift, (a[0], b[0]), (a[1], b[1]))
     
 
 def fluxfix(files, pdfname, guess=None, iterate=True, **kwargs):#add optional arguments for plotting, eg. files is a list of x1d fits spectra
@@ -287,6 +288,7 @@ def fluxfix(files, pdfname, guess=None, iterate=True, **kwargs):#add optional ar
     if guess is None:
         guess=(1, 0.5)
     pdf = PdfPages(pdfname)
+    outline = None
     for filename in files:
         if(filename.find('_x1d.fits') >= 0):
             basename=filename[0:filename.find('_x1d.fits')]
@@ -300,7 +302,7 @@ def fluxfix(files, pdfname, guess=None, iterate=True, **kwargs):#add optional ar
             filedata = file[i].data
             hdri = file[i].header
             shift = findshift(filedata, guess, iterate=iterate)
-            pixshift, pixerr, params = shift[0], shift[1], shift[2]
+            pixshift, params, paramerr = shift[0], shift[1], shift[2]
             new = fluxcorrect(filedata, pixshift)
             newflux, newerr = new[0], new[1]
             graph = generateplot(filedata, newflux, newerr, pixshift)
@@ -311,11 +313,17 @@ def fluxfix(files, pdfname, guess=None, iterate=True, **kwargs):#add optional ar
             pdf.savefig()
             file[i].data['flux'] = newflux
             file[i].data['error'] = newerr
+            outdata=shift + (ntpath.basename(filename),i,)
+            if(outline == None):
+                outline=[outdata]
+            else:
+                outline.append(outdata)
             i += 1
         hdr['comment'] = 'Spectra corrected using stisfix on ' + time.strftime('%d/%m/%Y')
         file.writeto(basename + '_x1f.fits',clobber=True)
         file.close()
     pdf.close()
+    return outline
 
 def plotblaze(filename, pdfname, ntrim=7):
     '''Plot the blaze function for each order of a STIS echelle spectrum.'''
