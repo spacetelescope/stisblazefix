@@ -146,7 +146,7 @@ def residcalc(filedata, flux=None, err=None, dq=None, ntrim=5):
     
     return (resids, residerr)
 
-def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresids=None, olderr=None, ntrim=3):
+def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresids=None, olderr=None, ntrim=5):
     '''Generate a diagnostic plot for a corrected spectrum. 
     
     Plot spectrum and residuals before and after correction to blaze function, 
@@ -227,7 +227,7 @@ def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresid
 
     return fig
 
-def genexplot(origdata, newflux, newerr, wav1, wav2, oldresids=None, olderr=None, ntrim=3):
+def genexplot(origdata, newflux, newerr, wav1, wav2, oldresids=None, olderr=None, ntrim=0):
     '''Generate a diagnostic plot for a corrected spectrum. 
     
     Plot spectrum and residuals before and after correction to blaze function, 
@@ -250,16 +250,7 @@ def genexplot(origdata, newflux, newerr, wav1, wav2, oldresids=None, olderr=None
     inwav=np.where((wavelength >= wav1) & (wavelength <= wav2))
     shape = np.shape(origflux)#(no. orders, no. pixels)
     yrange=cliprange(origflux[inwav],fraclim=0.02,pad=0.125)
-        
-    
-    if oldresids is None or olderr is None:
-        old = residcalc(origdata)
-        if oldresids is None:
-            oldresids = old[0]
-        if olderr is None:
-            olderr=old[1]
-    newresids, newresiderr = residcalc(origdata, flux=newflux, err=newerr)
-    
+            
     fig = plt.figure(figsize=(10,7))
     gs = gridspec.GridSpec(2, 1)
 
