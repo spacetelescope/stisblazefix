@@ -146,7 +146,7 @@ def residcalc(filedata, flux=None, err=None, dq=None, ntrim=5):
     
     return (resids, residerr)
 
-def generateplot(origdata, newflux, newerr, pixshift, oldresids=None, olderr=None, ntrim=5):
+def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresids=None, olderr=None, ntrim=3):
     '''Generate a diagnostic plot for a corrected spectrum. 
     
     Plot spectrum and residuals before and after correction to blaze function, 
@@ -211,12 +211,77 @@ def generateplot(origdata, newflux, newerr, pixshift, oldresids=None, olderr=Non
     plt.legend([before, after], ['Before Correction', 'After Correction'])
     plt.axis([shape[0]+2,-2,min([-3*np.median(np.abs(oldresids)),-0.02]),max([6*np.median(np.abs(oldresids)),0.04])])
     
+    parstra=' a = '+'{:.2f}'.format(params[0])+' +/- '+'{:.2f}'.format(paramerr[0])+' (pix)'
+    parstrb=' b = '+'{:.2f}'.format(params[1])+' +/- '+'{:.2f}'.format(paramerr[1])+' (pix/order)'
+    parstr=parstra+'\n'+parstrb
     pixplot = plt.subplot(gs[3], sharex=residplot)#graph of pixshift v spectral order
     plt.plot(pixshift, 'o', markersize=2)
     plt.title('Pixshift')
     plt.xlabel('Relative Spectral Order')
     plt.ylabel('Shift in Pixels')
+    plt.text(0.99*np.shape(pixshift)[0],0.9*np.max(pixshift+1)+0.1*np.min(pixshift-1),parstr,verticalalignment='center')
     plt.axis([shape[0]+2,-2,min(pixshift)-1,max(pixshift)+1])
+
+    #if params is not None:
+    #    txt.text('a + b*x'#check that call
+
+    return fig
+
+def genexplot(origdata, newflux, newerr, wav1, wav2, oldresids=None, olderr=None, ntrim=3):
+    '''Generate a diagnostic plot for a corrected spectrum. 
+    
+    Plot spectrum and residuals before and after correction to blaze function, 
+    and pixshift vs relative spectral order.
+    Return a figure object.
+    
+    origdata is the data attribute of an x1d fits file. This should contain the original flux.
+    newflux contains the corrected flux.
+    newerr contains the corrected error.
+    pixshift is a 1D vector with length equal to the number of orders in the echelle spectrum.
+    
+    kwargs:
+    oldresids contains the residuals for the uncorrected data.
+    olderr contains the error in the residuals for the uncorrected data.
+    If neither is passed, they will be calculated from origdata.
+    ntrim is a cut made to the edges of the orders to avoid various edge problems. Defaults to 5.
+    '''
+    origflux = origdata['flux']
+    wavelength = origdata['wavelength']
+    inwav=np.where((wavelength >= wav1) & (wavelength <= wav2))
+    shape = np.shape(origflux)#(no. orders, no. pixels)
+    yrange=cliprange(origflux[inwav],fraclim=0.02,pad=0.125)
+        
+    
+    if oldresids is None or olderr is None:
+        old = residcalc(origdata)
+        if oldresids is None:
+            oldresids = old[0]
+        if olderr is None:
+            olderr=old[1]
+    newresids, newresiderr = residcalc(origdata, flux=newflux, err=newerr)
+    
+    fig = plt.figure(figsize=(10,7))
+    gs = gridspec.GridSpec(2, 1)
+
+    oldspec = plt.subplot(gs[0])#spectrum before correction
+    order = 0
+    while order < shape[0]:
+        plt.plot(wavelength[order][ntrim:-(ntrim+1)], origflux[order][ntrim:-(ntrim+1)], lw=0.1, alpha=0.3)
+        order += 1
+    plt.title('Spectrum Before Correction')
+    plt.xlabel('Wavelength (Angstroms)')
+    plt.ylabel('Flux (erg/s/cm^2/Angstrom)')
+    plt.axis([wav1,wav2,yrange[0],yrange[1]])
+    
+    newspec = plt.subplot(gs[1], sharex=oldspec, sharey=oldspec)#spectrum after correction
+    order = 0
+    while order < shape[0]:
+        plt.plot(wavelength[order][ntrim:-(ntrim+1)], newflux[order][ntrim:-(ntrim+1)], lw=0.1, alpha=0.3)
+        order += 1
+    plt.title('Spectrum After Correction')
+    plt.xlabel('Wavelength (Angstroms)')
+    plt.ylabel('Flux (erg/s/cm^2/Angstrom)')
+    plt.axis([wav1,wav2,yrange[0],yrange[1]])
 
     #if params is not None:
     #    txt.text('a + b*x'#check that call
@@ -270,7 +335,7 @@ def findshift(filedata, guess, iterate=True):
     return (pixshift, (a[0], b[0]), (a[1], b[1]))
     
 
-def fluxfix(files, pdfname, guess=None, iterate=True, **kwargs):#add optional arguments for plotting, eg. files is a list of x1d fits spectra
+def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add optional arguments for plotting, eg. files is a list of x1d fits spectra
     '''Corrects STIS echelle spectra by aligning the sensitvity function to 
     compensate for shifts in the blaze function.
     
@@ -343,12 +408,24 @@ def fluxfix(files, pdfname, guess=None, iterate=True, **kwargs):#add optional ar
             pixshift, params, paramerr = shift[0], shift[1], shift[2]
             new = fluxcorrect(filedata, pixshift)
             newflux, newerr = new[0], new[1]
-            graph = generateplot(filedata, newflux, newerr, pixshift)
-            plt.suptitle(filename[:-9] + ' Extension: ' + str(i))
-            plt.suptitle(hdr['rootname']+' ext. '+str(i)+', '+hdr['targname']+', '+hdr['opt_elem']+' '+str(hdr['CENWAVE'])+' '+hdr['propaper']+', '+'{:.2f}'.format(hdri['exptime'])+'s, '+hdri['date-obs']+' '+hdri['time-obs'] )
-
+            graph = generateplot(filedata, newflux, newerr, pixshift, params, paramerr)
+            plt.suptitle(hdr['rootname']+' ext. '+str(i)+', '+hdr['targname']+', '+hdr['opt_elem']+' '+str(hdr['CENWAVE'])+' '+hdr['propaper']+', '+'{:.1f}'.format(hdri['exptime'])+'s, '+hdri['date-obs']+' '+hdri['time-obs'] )
             plt.tight_layout(rect=[0, 0.03, 1, 0.95])
             pdf.savefig()
+            plt.close()
+            if(nxplot > 1): 
+                fover=0.1
+                ws=file[i].data['wavelength'].min()
+                we=file[i].data['wavelength'].max()
+                dlambda = (we - ws) / nxplot
+                for ipx in range(nxplot):
+                    wav1=ws+ipx*dlambda*(1-fover/nxplot)
+                    wav2=ws+dlambda*(ipx+1+fover/nxplot*(nxplot-ipx))
+                    graph=genexplot(filedata,newflux,newerr,wav1,wav2)
+                    plt.suptitle(hdr['rootname']+' ext. '+str(i)+', '+hdr['targname']+', '+hdr['opt_elem']+' '+str(hdr['CENWAVE'])+' '+hdr['propaper']+', '+'{:.1f}'.format(hdri['exptime'])+'s, '+hdri['date-obs']+' '+hdri['time-obs'] )
+                    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+                    pdf.savefig()
+                    plt.close()
             file[i].data['flux'] = newflux
             file[i].data['error'] = newerr
             outdata=shift + (ntpath.basename(filename),i,)
