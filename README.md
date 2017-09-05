@@ -4,6 +4,7 @@ This module contains a variety of functions to correct the blaze function in HST
 echelle modes. It is intended for use with STIS echelle x1d fits files.
 Most users will be interested in the fluxfix function.
 
+The stisblazefix.py module contains the following routines:
 fluxfix takes a list of x1d fits files and generates corrected x1f files and diagnostic plots.
 fluxcorrect takes a shift to the blaze function and recalculates the flux and error.
 residcalc takes an echelle spectrum and calculates the flux residuals for the overlapping region.
