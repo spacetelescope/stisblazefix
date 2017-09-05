@@ -5,13 +5,13 @@
 #also needs access to all libraries loaded in stisblazefix.py
 
 import os,fnmatch,sys
-sys.path.append('/Users/proffitt/documents/stis/grit/stisblazefix/')
+sys.path.append('/YourPathToModule/stisblazefix/')
 
 import stisblazefix as sbf
 
 x1dlist=fnmatch.filter(os.listdir('.'), '*x1d.fits')
 
-sbf.fluxfix(x1dlist,'all.pdf')
+outdiclist=sbf.fluxfix(x1dlist,'all.pdf')
 
 
 

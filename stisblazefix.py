@@ -146,7 +146,7 @@ def residcalc(filedata, flux=None, err=None, dq=None, ntrim=5):
     
     return (resids, residerr)
 
-def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresids=None, olderr=None, ntrim=5):
+def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresids=None, oldresiderr=None, ntrim=5):
     '''Generate a diagnostic plot for a corrected spectrum. 
     
     Plot spectrum and residuals before and after correction to blaze function, 
@@ -160,7 +160,7 @@ def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresid
     
     kwargs:
     oldresids contains the residuals for the uncorrected data.
-    olderr contains the error in the residuals for the uncorrected data.
+    oldresiderr contains the error in the residuals for the uncorrected data.
     If neither is passed, they will be calculated from origdata.
     ntrim is a cut made to the edges of the orders to avoid various edge problems. Defaults to 5.
     '''
@@ -170,12 +170,12 @@ def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresid
     yrange=cliprange(origflux,fraclim=0.02,pad=0.125)
         
     
-    if oldresids is None or olderr is None:
+    if oldresids is None or oldresiderr is None:
         old = residcalc(origdata)
         if oldresids is None:
             oldresids = old[0]
-        if olderr is None:
-            olderr=old[1]
+        if oldresiderr is None:
+            oldresiderr=old[1]
     newresids, newresiderr = residcalc(origdata, flux=newflux, err=newerr)
     
     fig = plt.figure(figsize=(10,7))
@@ -202,7 +202,7 @@ def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresid
     plt.axis([wavelength.min(),wavelength.max(),yrange[0],yrange[1]])
     
     residplot = plt.subplot(gs[1])#residuals before and after correction vs spectral order
-    before = plt.errorbar(np.arange(np.shape(oldresids)[0]), oldresids, yerr=olderr, fmt='o', markersize=3, alpha=0.6)
+    before = plt.errorbar(np.arange(np.shape(oldresids)[0]), oldresids, yerr=oldresiderr, fmt='o', markersize=3, alpha=0.6)
     after = plt.errorbar(np.arange(np.shape(newresids)[0]), newresids, yerr=newresiderr, fmt='o', markersize=3, alpha=0.6)
     plt.plot(np.arange(np.shape(newresids)[0]), np.zeros(np.shape(newresids)[0]), '-')
     plt.ylabel('1 - Flux Ratio')
@@ -225,9 +225,9 @@ def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresid
     #if params is not None:
     #    txt.text('a + b*x'#check that call
 
-    return fig
+    return (fig, oldresids, oldresiderr, newresids, newresiderr)
 
-def genexplot(origdata, newflux, newerr, wav1, wav2, oldresids=None, olderr=None, ntrim=0):
+def genexplot(origdata, newflux, newerr, wav1, wav2, ntrim=0):
     '''Generate a diagnostic plot for a corrected spectrum. 
     
     Plot spectrum and residuals before and after correction to blaze function, 
@@ -240,9 +240,6 @@ def genexplot(origdata, newflux, newerr, wav1, wav2, oldresids=None, olderr=None
     pixshift is a 1D vector with length equal to the number of orders in the echelle spectrum.
     
     kwargs:
-    oldresids contains the residuals for the uncorrected data.
-    olderr contains the error in the residuals for the uncorrected data.
-    If neither is passed, they will be calculated from origdata.
     ntrim is a cut made to the edges of the orders to avoid various edge problems. Defaults to 5.
     '''
     origflux = origdata['flux']
@@ -360,18 +357,19 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add o
         to True.
     
     Returns:
-       An array of tuples, one for each exposure found in the x1d files. Each tuple
-       contains:
-          - An array containing the final shift value in pixels for each spectral order in
-          the file.
-          - A two element tuple containing the (a, b) coefficients giving the offset of
-          the lowest spectral order and the change in offset per order. The shift array
-          above should = a + b*i for each element i in the array.
-          - A two element tuple containing the formal errors in a and b found from the 
-          minimization routine.
-          - A string containing the name of the input file
-          - An integer containing the extension number of the input file from which the
-          exposure was taken.
+       An list of dictionaries, one for each exposure found in the x1d files. Each list
+       element contains:
+         {'pixshift': pixshift,\   # array of pixel shift values applied to sens curve
+          'acof': acof,\           # offset applied to sens curve of lowest order
+          'bcof': bcof,\           # change in offset per order
+          'acoferr': acoferr,\     # formal error in the value for acof
+          'bcoferr': bcoferr,\     # formal error in the value for bcof
+          'oldresids': oldresids,\ # vector of residual flux differences in order overlaps of original data
+          'oldresiderr': oldresiderr,\ # error vector for oldresids
+          'newresids': newresids,\ # vector of residual flux differences in order overlaps of corrected data
+          'newresiderr': newresiderr,\  # error vector for newresids
+          'filename': ntpath.basename(filename),\ #input file name
+          'extno': i}   # extension number of input file
     
     Produces:
        A new copy of each x1d file with the fluxes and errors corrected for the new 
@@ -399,8 +397,11 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add o
             pixshift, params, paramerr = shift[0], shift[1], shift[2]
             new = fluxcorrect(filedata, pixshift)
             newflux, newerr = new[0], new[1]
-            graph = generateplot(filedata, newflux, newerr, pixshift, params, paramerr)
-            plt.suptitle(hdr['rootname']+' ext. '+str(i)+', '+hdr['targname']+', '+hdr['opt_elem']+' '+str(hdr['CENWAVE'])+' '+hdr['propaper']+', '+'{:.1f}'.format(hdri['exptime'])+'s, '+hdri['date-obs']+' '+hdri['time-obs'] )
+            graph, oldresids, oldresiderr, newresids, newresiderr = generateplot(filedata, newflux, newerr, pixshift, params, paramerr)
+            (plt.suptitle(hdr['rootname']+' ext. '+str(i)+', '+hdr['targname']      
+                +', '+hdr['opt_elem']+' '+str(hdr['CENWAVE'])+' '+hdr['propaper']  
+                +', '+'{:.1f}'.format(hdri['exptime'])+'s, '+hdri['date-obs']      
+                +' '+hdri['time-obs'] ) )
             plt.tight_layout(rect=[0, 0.03, 1, 0.95])
             pdf.savefig()
             plt.close()
@@ -413,13 +414,28 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add o
                     wav1=ws+ipx*dlambda*(1-fover/nxplot)
                     wav2=ws+dlambda*(ipx+1+fover/nxplot*(nxplot-ipx))
                     graph=genexplot(filedata,newflux,newerr,wav1,wav2)
-                    plt.suptitle(hdr['rootname']+' ext. '+str(i)+', '+hdr['targname']+', '+hdr['opt_elem']+' '+str(hdr['CENWAVE'])+' '+hdr['propaper']+', '+'{:.1f}'.format(hdri['exptime'])+'s, '+hdri['date-obs']+' '+hdri['time-obs'] )
+                    (plt.suptitle(hdr['rootname']+' ext. '+str(i)+', '+hdr['targname']  
+                     +', '+hdr['opt_elem']+' '+str(hdr['CENWAVE'])+' '+hdr['propaper'] 
+                     +', '+'{:.1f}'.format(hdri['exptime'])+'s, '+hdri['date-obs']     
+                     +' '+hdri['time-obs'] )  )
                     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
                     pdf.savefig()
                     plt.close()
             file[i].data['flux'] = newflux
             file[i].data['error'] = newerr
-            outdata=shift + (ntpath.basename(filename),i,)
+            pixshift, (acof,bcof), (acoferr,bcoferr) = shift
+            outdata = {'pixshift': pixshift,\
+                        'acof': acof,\
+                        'bcof': bcof,\
+                        'acoferr': acoferr,\
+                        'bcoferr': bcoferr,\
+                        'oldresids': oldresids,\
+                        'oldresiderr': oldresiderr,\
+                        'newresids': newresids,\
+                        'newresiderr': newresiderr,\
+                        'filename': ntpath.basename(filename),\
+                        'extno': i}
+            #outdata=shift + (oldresids, oldresiderr, newresids, newresiderr, ntpath.basename(filename),i,)
             if(outline == None):
                 outline=[outdata]
             else:
