@@ -8,7 +8,7 @@
 #
 #
 #This module requires:
-#numpy, scipy, astropy, matplotlib, lmfit, time
+#numpy, scipy, astropy, matplotlib, lmfit, time, ntpath
 
 # LMFIT is not in the standard astroconda distribution,
 # but can be added to an anaconda environment by first
@@ -355,21 +355,25 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add o
         a & b that minimimize the inconsistency in the flux ovelap regions. When set to 
         False, the code will use the values supplied in Guess without iterating. Defaults
         to True.
+        
+        nxplot (integer): default 1. When set to a value > 1 will add extra plot pages,
+        each comparing the original and corrected spectrum over approximately 1/nxplot of
+        the wavelength range, but allowing a slight wavelength overlap between the plots.
     
     Returns:
        An list of dictionaries, one for each exposure found in the x1d files. Each list
        element contains:
-         {'pixshift': pixshift,\   # array of pixel shift values applied to sens curve
-          'acof': acof,\           # offset applied to sens curve of lowest order
-          'bcof': bcof,\           # change in offset per order
-          'acoferr': acoferr,\     # formal error in the value for acof
-          'bcoferr': bcoferr,\     # formal error in the value for bcof
-          'oldresids': oldresids,\ # vector of residual flux differences in order overlaps of original data
-          'oldresiderr': oldresiderr,\ # error vector for oldresids
-          'newresids': newresids,\ # vector of residual flux differences in order overlaps of corrected data
-          'newresiderr': newresiderr,\  # error vector for newresids
-          'filename': ntpath.basename(filename),\ #input file name
-          'extno': i}   # extension number of input file
+         {'pixshift': pixshift,   # array of pixel shift values applied to sens curve
+          'acof': acof,           # offset applied to sens curve of lowest order
+          'bcof': bcof,           # change in offset per order
+          'acoferr': acoferr,     # formal error in the value for acof
+          'bcoferr': bcoferr,     # formal error in the value for bcof
+          'oldresids': oldresids, # vector of residual flux differences in order overlaps of original data
+          'oldresiderr': oldresiderr, # error vector for oldresids
+          'newresids': newresids, # vector of residual flux differences in order overlaps of corrected data
+          'newresiderr': newresiderr,  # error vector for newresids
+          'filename': ntpath.basename(filename), #input file name
+          'extno': i}   # extension number of input file for this exposure
     
     Produces:
        A new copy of each x1d file with the fluxes and errors corrected for the new 
@@ -424,18 +428,18 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add o
             file[i].data['flux'] = newflux
             file[i].data['error'] = newerr
             pixshift, (acof,bcof), (acoferr,bcoferr) = shift
-            outdata = {'pixshift': pixshift,\
-                        'acof': acof,\
-                        'bcof': bcof,\
-                        'acoferr': acoferr,\
-                        'bcoferr': bcoferr,\
-                        'oldresids': oldresids,\
-                        'oldresiderr': oldresiderr,\
-                        'newresids': newresids,\
-                        'newresiderr': newresiderr,\
-                        'filename': ntpath.basename(filename),\
-                        'extno': i}
-            #outdata=shift + (oldresids, oldresiderr, newresids, newresiderr, ntpath.basename(filename),i,)
+            outdata = {'pixshift': pixshift,
+                'acof': acof,
+                'bcof': bcof,
+                'acoferr': acoferr,
+                'bcoferr': bcoferr,
+                'oldresids': oldresids,
+                'oldresiderr': oldresiderr,
+                'newresids': newresids,
+                'newresiderr': newresiderr,
+                'filename': ntpath.basename(filename),
+                'extno': i,
+                }
             if(outline == None):
                 outline=[outdata]
             else:
@@ -469,8 +473,9 @@ def plotblaze(filename, pdfname, ntrim=7):
         plt.title('Blaze Function')
         plt.xlabel('Wavelength (Angstroms)')
         plt.ylabel('Relative Intensity')
-        plt.suptitle(filename[:-9] + ' Extension: ' + str(i))
+        plt.suptitle(ntpath.basename(filename) + ' Extension: ' + str(i))
         pdf.savefig()
+        plt.close()
         i += 1
     file.close()
     pdf.close()
