@@ -64,7 +64,10 @@ def fluxcorrect(filedata, pixshift):
     while order < shape[0]:#number of orders
         oldblaze=origblaze[order]
         isgood=np.where(np.isfinite(oldblaze))
-        f = interpolate.interp1d(pixnos[isgood[0]], oldblaze[isgood[0]], fill_value='extrapolate')#
+        if(np.size(isgood) > 1):
+            f = interpolate.interp1d(pixnos[isgood[0]], oldblaze[isgood[0]], fill_value='extrapolate')
+        else:
+            f = interpolate.interp1d(pixnos,np.ones(np.size(pixnos)), fill_value='extrapolate')
         newblaze[order] = f(pixnos - pixshift[order])#shifts the blaze function
         order += 1
     newflux = np.divide(filedata['net'], newblaze)
