@@ -392,6 +392,11 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add o
             basename=filename[0:filename.find('.fit')]
         file = fits.open(filename)
         hdr = file[0].header
+        if(hdr['opt_elem'][0] != 'E'):
+           print(filename+' does not look like an echelle X1D file!')
+           print("optical element = "+hdr['opt_elem'])
+           print('skipping file')
+           continue
         extno = len(file)
         i = 1
         while i < extno:#for i, extension in enumerate(file, start=1):#while i < extno:
