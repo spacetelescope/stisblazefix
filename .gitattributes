@@ -1,0 +1,3 @@
+stisblazefix/testdata/* linguist-documentation
+doc/* linguist-documentation
+*.fits -diff
