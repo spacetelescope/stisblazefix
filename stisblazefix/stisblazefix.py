@@ -8,7 +8,7 @@
 #
 #
 #This module requires:
-#numpy, scipy, astropy, matplotlib, lmfit, time, ntpath
+#numpy, scipy, astropy, matplotlib, lmfit
 
 # LMFIT is not in the standard astroconda distribution,
 # but can be added to an anaconda environment by first
@@ -18,20 +18,20 @@
 #NOTE: requires at least numpy 1.13, bugs occur with numpy 1.12
 #
 #Import using the command "import stisblazefix"
-#
 
-'''This module contains a variety of functions to correct the blaze function in HST STIS
-echelle modes. It is intended for use with x1d fits files. Most users will be interested 
+
+'''This module contains a variety of functions to correct the blaze function in HST/STIS
+echelle modes. It is intended for use with x1d FITS files. Most users will be interested 
 in the fluxfix function.
 
-#This module contains required functions for the following scripts:
-fluxcorrect takes a shift to the blaze function and recalculates the flux and error.
-residcalc takes an echelle spectrum and calculates the flux residuals for the overlapping region.
-generateplot takes an old and corrected spectrum and generates a diagnostic plot.
-residfunc is a wrapper for lmfit minimizer.
-findshift calculates the shift to the blaze function that best aligns the spectrum.
-fluxfix takes a list of x1d fits files and generates corrected x1f files and diagnostic plots.
-plotblaze plots the sensitivity curves for an extracted spectra.
+This module contains required functions for the following scripts:
+  fluxcorrect takes a shift to the blaze function and recalculates the flux and error.
+  residcalc takes an echelle spectrum and calculates the flux residuals for the overlapping region.
+  generateplot takes an old and corrected spectrum and generates a diagnostic plot.
+  residfunc is a wrapper for lmfit minimizer.
+  findshift calculates the shift to the blaze function that best aligns the spectrum.
+  fluxfix takes a list of x1d fits files and generates corrected x1f files and diagnostic plots.
+  plotblaze plots the sensitivity curves for an extracted spectra.
 '''
 
 from astropy.io import fits
@@ -43,8 +43,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.text as txt
 from lmfit import Parameters, Minimizer, conf_interval, minimize, printfuncs
-import time
-import ntpath
+import datetime
+import os
 
 
 def fluxcorrect(filedata, pixshift):
@@ -279,7 +279,8 @@ def genexplot(origdata, newflux, newerr, wav1, wav2, ntrim=0):
 
     return fig
 
-def residfunc(pars, x, filedata):#function for lmfit - is there way to add loop for linear/0th/quadratic? - try adjusting number of parameters
+def residfunc(pars, x, filedata):
+    # function for lmfit - is there way to add loop for linear/0th/quadratic? - try adjusting number of parameters
     '''Wrapper for lmfit minimizer. 
     
     Return weighted residuals for a given pixshift.
@@ -326,7 +327,8 @@ def findshift(filedata, guess, iterate=True):
     return (pixshift, (a[0], b[0]), (a[1], b[1]))
     
 
-def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add optional arguments for plotting, eg. files is a list of x1d fits spectra
+def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):
+    # add optional arguments for plotting, eg. files is a list of x1d fits spectra
     '''Corrects STIS echelle spectra by aligning the sensitvity function to 
     compensate for shifts in the blaze function.
     
@@ -375,7 +377,7 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add o
           'oldresiderr': oldresiderr, # error vector for oldresids
           'newresids': newresids, # vector of residual flux differences in order overlaps of corrected data
           'newresiderr': newresiderr,  # error vector for newresids
-          'filename': ntpath.basename(filename), #input file name
+          'filename': os.path.basename(filename), #input file name
           'extno': i}   # extension number of input file for this exposure
     
     Produces:
@@ -445,7 +447,7 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add o
                 'oldresiderr': oldresiderr,
                 'newresids': newresids,
                 'newresiderr': newresiderr,
-                'filename': ntpath.basename(filename),
+                'filename': os.path.basename(filename),
                 'extno': i,
                 }
             if(outline == None):
@@ -453,8 +455,8 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):#add o
             else:
                 outline.append(outdata)
             i += 1
-        hdr['comment'] = 'Spectra corrected using stisfix on ' + time.strftime('%d/%m/%Y')
-        file.writeto(basename + '_x1f.fits',clobber=True)
+        hdr['comment'] = 'Spectra corrected using stisfix on ' + datetime.datetime.now().isoformat()
+        file.writeto(basename + '_x1f.fits', overwrite=True)
         file.close()
     pdf.close()
     return outline
@@ -481,7 +483,7 @@ def plotblaze(filename, pdfname, ntrim=7):
         plt.title('Blaze Function')
         plt.xlabel('Wavelength (Angstroms)')
         plt.ylabel('Relative Intensity')
-        plt.suptitle(ntpath.basename(filename) + ' Extension: ' + str(i))
+        plt.suptitle(os.path.basename(filename) + ' Extension: ' + str(i))
         pdf.savefig()
         plt.close()
         i += 1
