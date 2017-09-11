@@ -32,6 +32,48 @@ This module contains required functions for the following scripts:
   * ``findshift`` calculates the shift to the blaze function that best aligns the spectrum.
   * ``fluxfix`` takes a list of x1d fits files and generates corrected x1f files and diagnostic plots.
   * ``plotblaze`` plots the sensitivity curves for an extracted spectra.
+
+Installation
+============
+
+Dependencies
+------------
+
+The ``stisblazefix`` package is designed to run in the AstroConda_ environment.  After 
+installation, launch it via::
+
+  source activate astroconda
+
+.. _AstroConda: http://astroconda.readthedocs.io
+
+``LMFIT`` is required, but is not currently in the standard ``AstroConda`` distribution.  
+It can be added to an Anaconda environment by first activating the desired environment and 
+then running::
+
+  conda install -c conda-forge lmfit
+
+.. WARNING::
+
+  Requires at least numpy 1.13, bugs occur with numpy 1.12.
+
+Conda Installation
+------------------
+
+Once ``LMFIT`` is installed, install the ``stisblazefix`` module via::
+
+  conda install -c sean-lockwood stisblazefix
+
+Manual Installation
+-------------------
+
+Alternatively, you may download_ and manually install `stisblazefix` via::
+
+  python setup.py install
+
+.. _download: https://anaconda.org/sean-lockwood/stisblazefix/files
+
+API
+===
 '''
 
 from astropy.io import fits
