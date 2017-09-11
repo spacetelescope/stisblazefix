@@ -21,8 +21,8 @@
 
 
 '''This module contains a variety of functions to correct the blaze function in HST/STIS
-echelle modes. It is intended for use with x1d FITS files. Most users will be interested 
-in the fluxfix function.
+echelle modes. It is intended for use with `x1d` FITS files. Most users will be interested 
+in the ``fluxfix`` function.
 
 This module contains required functions for the following scripts:
   * ``fluxcorrect`` takes a shift to the blaze function and recalculates the flux and error.
@@ -30,7 +30,7 @@ This module contains required functions for the following scripts:
   * ``generateplot`` takes an old and corrected spectrum and generates a diagnostic plot.
   * ``residfunc`` is a wrapper for lmfit minimizer.
   * ``findshift`` calculates the shift to the blaze function that best aligns the spectrum.
-  * ``fluxfix`` takes a list of x1d fits files and generates corrected x1f files and diagnostic plots.
+  * ``fluxfix`` takes a list of `x1d` fits files and generates corrected x1f files and diagnostic plots.
   * ``plotblaze`` plots the sensitivity curves for an extracted spectra.
 
 Installation
@@ -66,14 +66,14 @@ Once ``LMFIT`` is installed, install the ``stisblazefix`` module via::
 Manual Installation
 -------------------
 
-Alternatively, you may download_ and manually install `stisblazefix` via::
+Alternatively, you may download_ and manually install ``stisblazefix`` via::
 
   python setup.py install
 
 .. _download: https://anaconda.org/sean-lockwood/stisblazefix/files
 
-API
-===
+Python API
+==========
 '''
 
 from astropy.io import fits
@@ -91,11 +91,10 @@ import os
 
 def fluxcorrect(filedata, pixshift):
     '''Recalculate and return corrected flux and error vectors, based on shifted blaze function.
-    
-    filedata is the data attribute of an x1d fits file.
-    
-    pixshift is a 1D vector with length equal to the number of orders in the echelle spectrum.
-    It contains the shift of the blaze function in pixels as a function of relative spectral order.
+
+      * ``filedata`` is the data attribute of an `x1d` fits file.
+      * ``pixshift`` is a 1D vector with length equal to the number of orders in the echelle spectrum.
+        It contains the shift of the blaze function in pixels as a function of relative spectral order.
     '''
 
     origblaze = np.divide(filedata['net'], filedata['flux'])#back out original sensitivity
@@ -121,18 +120,20 @@ def fluxcorrect(filedata, pixshift):
 
 def residcalc(filedata, flux=None, err=None, dq=None, ntrim=5):
     '''Calculate and return the flux overlap residuals and weighted error.
-    
+
     Flux residuals are calculated by summing the flux in the overlapping region in adjacent orders,
     taking the ratio, and subtracting from one.
-    
-    filedata is the data attribute of an x1d fits file.
-    
-    kwargs:
-    flux is a flux vector the same size as the flux in filedata.
-    erre is an error vector the same size as the error rin filedata.
-    If either flux or error is passed, they will be used to calculate the residuals.
-    Otherwise, the flux and error from filedata will be used.
-    ntrim is a cut made to the edges of the orders to avoid various edge problems. Defaults to 5.
+
+    ``filedata`` is the data attribute of an `x1d` FITS file.
+
+    kwargs:  
+      * ``flux`` : flux vector the same size as the `flux` in filedata.  
+      * ``err``  : error vector the same size as the `error` in filedata.  
+      * ``dq``   : data quality vector the same size as the `dq` in filedata.  
+      * ``ntrim``: cut made to the edges of the orders to avoid various edge problems. Defaults to 5.
+
+      If either ``flux`` or ``error`` is passed, they will be used to calculate the residuals.  
+      Otherwise, the `flux` and `error` arrays from ``filedata`` will be used.  
     '''
     if flux is None:
         flux = filedata['flux']
@@ -193,21 +194,22 @@ def residcalc(filedata, flux=None, err=None, dq=None, ntrim=5):
 
 def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresids=None, oldresiderr=None, ntrim=5):
     '''Generate a diagnostic plot for a corrected spectrum. 
-    
+
     Plot spectrum and residuals before and after correction to blaze function, 
     and pixshift vs relative spectral order.
     Return a figure object.
-    
-    origdata is the data attribute of an x1d fits file. This should contain the original flux.
-    newflux contains the corrected flux.
-    newerr contains the corrected error.
-    pixshift is a 1D vector with length equal to the number of orders in the echelle spectrum.
-    
+
+    * ``origdata``: the data attribute of an `x1d` FITS file. This should contain the original flux.
+    * ``newflux`` : the corrected flux.
+    * ``newerr``  : the corrected error.
+    * ``pixshift``: a 1D vector with length equal to the number of orders in the echelle spectrum.
+
     kwargs:
-    oldresids contains the residuals for the uncorrected data.
-    oldresiderr contains the error in the residuals for the uncorrected data.
-    If neither is passed, they will be calculated from origdata.
-    ntrim is a cut made to the edges of the orders to avoid various edge problems. Defaults to 5.
+      * ``oldresids``   : the residuals for the uncorrected data.
+      * ``oldresiderr`` : the error in the residuals for the uncorrected data.
+      * ``ntrim``       : the cut made to the edges of the orders to avoid various edge problems. Defaults to 5.  
+
+    If neither ``oldresids`` or ``oldresiderr`` is passed, they will be calculated from ``origdata``.
     '''
     origflux = origdata['flux']
     wavelength = origdata['wavelength']
@@ -273,19 +275,19 @@ def generateplot(origdata, newflux, newerr, pixshift, params, paramerr, oldresid
     return (fig, oldresids, oldresiderr, newresids, newresiderr)
 
 def genexplot(origdata, newflux, newerr, wav1, wav2, ntrim=0):
-    '''Generate a diagnostic plot for a corrected spectrum. 
+    '''Generate a diagnostic plot for a corrected spectrum.
     
     Plot spectrum and residuals before and after correction to blaze function, 
     and pixshift vs relative spectral order.
     Return a figure object.
     
-    origdata is the data attribute of an x1d fits file. This should contain the original flux.
-    newflux contains the corrected flux.
-    newerr contains the corrected error.
-    pixshift is a 1D vector with length equal to the number of orders in the echelle spectrum.
+    ``origdata``: the data attribute of an `x1d` FITS file. This should contain the original flux.  
+    ``newflux`` : the corrected flux.  
+    ``newerr``  : the corrected error.  
+    ``pixshift``: a 1D vector with length equal to the number of orders in the echelle spectrum.
     
-    kwargs:
-    ntrim is a cut made to the edges of the orders to avoid various edge problems. Defaults to 5.
+    kwargs:  
+      * ``ntrim`` is a cut made to the edges of the orders to avoid various edge problems. Defaults to 5.
     '''
     origflux = origdata['flux']
     wavelength = origdata['wavelength']
@@ -323,13 +325,12 @@ def genexplot(origdata, newflux, newerr, wav1, wav2, ntrim=0):
 
 def residfunc(pars, x, filedata):
     # function for lmfit - is there way to add loop for linear/0th/quadratic? - try adjusting number of parameters
-    '''Wrapper for lmfit minimizer. 
-    
+    '''Wrapper for `lmfit` minimizer.
     Return weighted residuals for a given pixshift.
-    
-    pars is a tuple containing lmfit parameters.
-    x is the variable, in this case relative spectral order.
-    filedata is the data attribute of an x1d fits file.
+
+    * ``pars``    : a tuple containing `lmfit` parameters.  
+    * ``x``       : the input variable, in this case relative spectral order.  
+    * ``filedata``: the data attribute of an `x1d` FITS file.
     '''
     a = pars['a'].value
     b = pars['b'].value
@@ -343,16 +344,16 @@ def residfunc(pars, x, filedata):
     
 def findshift(filedata, guess, iterate=True):
     '''Find pixshift that best aligns spectral orders.
-    
-    Use lmfit to calculate the pixshift (to apply to the blaze function) as a linear 
+
+    Use `lmfit` to calculate the pixshift (to apply to the blaze function) as a linear 
     function of relative spectral order that minimizes the flux overlap residuals
-    as calculated in residcalc.
-    
-    Return pixshift, the error in the pixshift, and the final parameters.
-    
-    filedata is the data attribute of an x1d fits file.
-    guess is a tuple containing the starting parameters for the fit.
-    iterate is a Boolean that determines whether the function iterates to find the best fit.
+    as calculated in `residcalc`.
+
+    * ``filedata``: the data attribute of an `x1d` FITS file.  
+    * ``guess``   : a tuple containing the starting parameters for the fit.  
+    * ``iterate`` : Boolean that determines whether the function iterates to find the best fit.
+
+    Returns `pixshift`, the error in the `pixshift`, and the final parameters.
     '''
     x = np.arange(np.shape(filedata)[0])
     params = Parameters()
@@ -374,11 +375,11 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):
     '''Corrects STIS echelle spectra by aligning the sensitvity function to 
     compensate for shifts in the blaze function.
     
-    This routine will iterate over a list of STIS echelle x1d files and for each exposure
+    This routine will iterate over a list of STIS echelle `x1d` files and for each exposure
     in each file it will find the shifts of the sensitivy curves for the spectral orders 
     that maximize the flux consistency in the overlap between orders. Corrected flux and 
-    error vectors are then calculated and saved to new output files where '_x1d.fits' is 
-    replaced with '_x1f.fits'.
+    error vectors are then calculated and saved to new output files where `_x1d.fits` is 
+    replaced with `_x1f.fits`.
     
     It assumes that amount by which the sensitivity curve for each spectral order 
     needs to be shifted is a linear function of the order number. The optimal shifts for 
@@ -387,46 +388,49 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):
     
     Args:
 
-        files (list of str): A list of file names corresponding to STIS echelle x1d files.
-        All file names should end in '_x1d.fits' and should contain extracted and flux
-        calibrated STIS echelle spectra output from CALSTIS.
+        ``files`` (list of str): A list of file names corresponding to STIS echelle x1d files.
+        All file names should end in `_x1d.fits` and should contain extracted and flux
+        calibrated STIS echelle spectra output from CalSTIS_.
 
-        pdfname (str): Name for the output pdf file.
+        ``pdfname`` (str): Name for the output PDF file.
         
-        guess (tuple of two floats): Contains a starting guess for the linear relation 
+        ``guess`` (tuple of two floats): Contains a starting guess for the linear relation 
         used to shift the blaze function. Should be in the form (a, b), where the blaze 
-        shift for each spectral order x will be a + b*x. Defaults to None which then
+        shift for each spectral order `x` will be `a + b*x`. Defaults to `None`, which then
         substitutes a suitable guess supplied in the code.
 
-        Iterate (logical): When set to True the code will iterate to find the values for
-        a & b that minimimize the inconsistency in the flux ovelap regions. When set to 
+        ``iterate`` (bool): When set to `True` the code will iterate to find the values for
+        `a` & `b` that minimimize the inconsistency in the flux ovelap regions. When set to 
         False, the code will use the values supplied in Guess without iterating. Defaults
         to True.
         
-        nxplot (integer): default 1. When set to a value > 1 will add extra plot pages,
+        ``nxplot`` (integer): default 1. When set to a value > 1 will add extra plot pages,
         each comparing the original and corrected spectrum over approximately 1/nxplot of
         the wavelength range, but allowing a slight wavelength overlap between the plots.
     
-    Returns:
-       An list of dictionaries, one for each exposure found in the x1d files. Each list
+    Returns:  
+       A list of dictionaries, one for each exposure found in the `x1d` files. Each list
        element contains:
-         {'pixshift': pixshift,   # array of pixel shift values applied to sens curve
-          'acof': acof,           # offset applied to sens curve of lowest order
-          'bcof': bcof,           # change in offset per order
-          'acoferr': acoferr,     # formal error in the value for acof
-          'bcoferr': bcoferr,     # formal error in the value for bcof
-          'oldresids': oldresids, # vector of residual flux differences in order overlaps of original data
-          'oldresiderr': oldresiderr, # error vector for oldresids
-          'newresids': newresids, # vector of residual flux differences in order overlaps of corrected data
-          'newresiderr': newresiderr,  # error vector for newresids
-          'filename': os.path.basename(filename), #input file name
-          'extno': i}   # extension number of input file for this exposure
-    
-    Produces:
-       A new copy of each x1d file with the fluxes and errors corrected for the new 
-       shift of the sensitivity vector. The new files replace 'x1d' in the file names
-       with 'x1f'.
-       A multipage pdf file with diagnostic plots for each exposure. 
+
+       * ``pixshift``    : array of pixel shift values applied to sens curve  
+       * ``acof``        : offset applied to sens curve of lowest order  
+       * ``bcof``        : change in offset per order  
+       * ``acoferr``     : formal error in the value for acof  
+       * ``bcoferr``     : formal error in the value for bcof  
+       * ``oldresids``   : vector of residual flux differences in order overlaps of original data  
+       * ``oldresiderr`` : error vector for oldresids  
+       * ``newresids``   : vector of residual flux differences in order overlaps of corrected data  
+       * ``newresiderr`` : error vector for newresids  
+       * ``filename``    : input file name  
+       * ``extno``       : extension number of input file for this exposure  
+
+    Produces:  
+       * A new copy of each `x1d` file with the fluxes and errors corrected for the new 
+         shift of the sensitivity vector. The new files replace `x1d` in the file names
+         with `x1f`.
+       * A multipage PDF file with diagnostic plots for each exposure.
+
+    .. _CalSTIS: http://ssb.stsci.edu/doc/stsci_python_dev/stistools.doc/html/calstis.html
     '''
     if guess is None:
         guess=(1, 0.5)
@@ -534,7 +538,7 @@ def plotblaze(filename, pdfname, ntrim=7):
 
 def cliprange(vector, fraclim=0.02, pad=0.125):
     ''' For a vector first find the limits, :math:`v_0` and :math:`v_1`, on the value that 
-    includes from fraclim to 1 - fraclim of the pixels.
+    includes from fraclim to 1 - fraclim of the pixels.  
     Then expand that range on both the lower and upper end by an amount :math:`\mbox{pad}*(v_1-v_0)`
     '''
     hist=np.histogram(vector,bins='auto')
@@ -547,10 +551,10 @@ def cliprange(vector, fraclim=0.02, pad=0.125):
     return newrange+pad*np.array([-fullrange,fullrange])
         
 def mkdqmask(dq,sdqflags=2604):
-    '''Return mask vector set to zero wherever any bit set in the dq vector matches 
-    any bit set in sdqflags and to one elsewhere.
-    Default sdqflags = 4 + 8 + 32 + 512 + 2048 = 2604
-    Detector problem + data masked + large blemish + calibration defect + bad background
+    '''Return mask vector set to zero wherever any bit set in the `dq` vector matches 
+    any bit set in ``sdqflags`` and to one elsewhere.  
+|   Default `sdqflags` = 4 + 8 + 32 + 512 + 2048 = 2604  
+|    = detector problem + data masked + large blemish + calibration defect + bad background
     '''
     mask=0*dq+1.0
     mask[np.where((dq & sdqflags) > 0)] = 0
