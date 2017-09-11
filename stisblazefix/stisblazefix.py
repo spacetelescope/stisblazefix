@@ -25,13 +25,13 @@ echelle modes. It is intended for use with x1d FITS files. Most users will be in
 in the fluxfix function.
 
 This module contains required functions for the following scripts:
-  fluxcorrect takes a shift to the blaze function and recalculates the flux and error.
-  residcalc takes an echelle spectrum and calculates the flux residuals for the overlapping region.
-  generateplot takes an old and corrected spectrum and generates a diagnostic plot.
-  residfunc is a wrapper for lmfit minimizer.
-  findshift calculates the shift to the blaze function that best aligns the spectrum.
-  fluxfix takes a list of x1d fits files and generates corrected x1f files and diagnostic plots.
-  plotblaze plots the sensitivity curves for an extracted spectra.
+  * ``fluxcorrect`` takes a shift to the blaze function and recalculates the flux and error.
+  * ``residcalc`` takes an echelle spectrum and calculates the flux residuals for the overlapping region.
+  * ``generateplot`` takes an old and corrected spectrum and generates a diagnostic plot.
+  * ``residfunc`` is a wrapper for lmfit minimizer.
+  * ``findshift`` calculates the shift to the blaze function that best aligns the spectrum.
+  * ``fluxfix`` takes a list of x1d fits files and generates corrected x1f files and diagnostic plots.
+  * ``plotblaze`` plots the sensitivity curves for an extracted spectra.
 '''
 
 from astropy.io import fits
@@ -491,9 +491,9 @@ def plotblaze(filename, pdfname, ntrim=7):
     pdf.close()
 
 def cliprange(vector, fraclim=0.02, pad=0.125):
-    ''' For a vector first find the limits, v_0 and v_1, on the value that 
-    includes from fraclim to 1-fraclim of the pixels.
-    Then expand that range on both the lower and upper end by an amount pad*(v_1-v_0)
+    ''' For a vector first find the limits, :math:`v_0` and :math:`v_1`, on the value that 
+    includes from fraclim to 1 - fraclim of the pixels.
+    Then expand that range on both the lower and upper end by an amount :math:`\mbox{pad}*(v_1-v_0)`
     '''
     hist=np.histogram(vector,bins='auto')
     cdist=np.cumsum(hist[0])
@@ -507,7 +507,7 @@ def cliprange(vector, fraclim=0.02, pad=0.125):
 def mkdqmask(dq,sdqflags=2604):
     '''Return mask vector set to zero wherever any bit set in the dq vector matches 
     any bit set in sdqflags and to one elsewhere.
-    Default sdqflags=4+8+32+512+2048 = 2604
+    Default sdqflags = 4 + 8 + 32 + 512 + 2048 = 2604
     Detector problem + data masked + large blemish + calibration defect + bad background
     '''
     mask=0*dq+1.0
