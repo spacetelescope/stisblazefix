@@ -108,7 +108,7 @@ html_theme_options = {
     'logo'            : 'stis_logo.png', 
     'logo_name'       : True, 
     'logo_text_align' : 'center', 
-    'description'     : 'Correct the blaze function for HST/STIS echelle modes', 
+    'description'     : 'Correct the HST/STIS echelle blaze function',
     'github_user'     : 'spacetelescope',
     'github_repo'     : 'stisblazefix', 
     'github_button'   : True, 
@@ -180,7 +180,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'stisblazefix', 'stisblazefix Documentation',
-     author, 'stisblazefix', 'Correct the blaze function for HST/STIS echelle modes',
+     author, 'stisblazefix', 'Correct the HST/STIS echelle blaze function',
      'Miscellaneous'),
 ]
 
