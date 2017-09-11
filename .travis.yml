@@ -50,6 +50,9 @@ install:
     - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION nose #coverage
     - source activate test-environment
 
+    # Add external dependency to LMFIT:
+    - conda install -c conda-forge lmfit
+
     # Test building and installing the conda package:
     - conda build --python $TRAVIS_PYTHON_VERSION .
     - conda install stisblazefix --use-local
