@@ -116,7 +116,7 @@ html_theme_options = {
     'github_banner'   : False, 
     'travis_button'   : True, 
     'show_powered_by' : False, 
-    'analytics_id'    : '',
+    'analytics_id'    : 'UA-67123509-4',
     'page_width'      : 1040,}
 
 html_sidebars = {
