@@ -1,4 +1,11 @@
-STIS echelle blaze function correction script.
+STIS echelle blaze function correction script
+=============================================
+
+Correction for the HST/STIS echelle blaze function.
+
+See documentation at https://stisblazefix.readthedocs.io
+
+|build-status| |docs| |conda|
 
 This module contains a variety of functions to correct the blaze function in HST STIS
 echelle modes. It is intended for use with STIS echelle x1d fits files.
@@ -18,3 +25,18 @@ mkdqmask creates a mask based on the bits set in data quality flags
 IDL version by C. Proffitt Jan 2017
 Python adaptation by M. Baer Jun-Aug 2017
 Additional fixes by C. Proffitt Aug-Sep 2017
+
+
+.. |build-status| image:: https://travis-ci.org/spacetelescope/stisblazefix.svg?branch=master
+    :alt: build status
+    :scale: 100%
+    :target: https://travis-ci.org/spacetelescope/stisblazefix
+
+.. |docs| image:: https://readthedocs.org/projects/stisblazefix/badge/
+    :alt: Documentation Status
+    :scale: 100%
+    :target: http://stisblazefix.readthedocs.io/en/latest/?badge=latest
+
+.. |conda| image:: https://anaconda.org/sean-lockwood/stisblazefix/badges/installer/conda.svg
+    :alt: conda install
+    :target: https://anaconda.org/sean-lockwood/stisblazefix
