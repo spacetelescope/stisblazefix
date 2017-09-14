@@ -22,10 +22,13 @@ plotblaze plots the sensitivity curves for an extracted spectra.
 cliprange is used to set the Y range for some of the plots to exclude outliers
 mkdqmask creates a mask based on the bits set in data quality flags
 
-IDL version by C. Proffitt Jan 2017
-Python adaptation by M. Baer Jun-Aug 2017
+IDL version by C. Proffitt Jan 2017 |br|
+Python adaptation by M. Baer Jun-Aug 2017 |br|
 Additional fixes by C. Proffitt Aug-Sep 2017
 
+.. |br| raw:: html
+
+   <br />
 
 .. |build-status| image:: https://travis-ci.org/spacetelescope/stisblazefix.svg?branch=master
     :alt: build status
