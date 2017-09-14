@@ -4,4 +4,6 @@ include setup.py
 include stisblazefix/*.py
 include stisblazefix/testdata/*.fits
 global-exclude *.pyc
+exclude stisblazefix.egg-info
 exclude runall.py
+exclude outputdir
