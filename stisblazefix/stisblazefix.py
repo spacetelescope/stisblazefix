@@ -30,7 +30,7 @@ This module contains required functions for the following scripts:
   * ``generateplot`` takes an old and corrected spectrum and generates a diagnostic plot.
   * ``residfunc`` is a wrapper for lmfit minimizer.
   * ``findshift`` calculates the shift to the blaze function that best aligns the spectrum.
-  * ``fluxfix`` takes a list of `x1d` fits files and generates corrected x1f files and diagnostic plots.
+  * ``fluxfix`` takes a list of `x1d` fits files and generates corrected `x1f` files and diagnostic plots.
   * ``plotblaze`` plots the sensitivity curves for an extracted spectra.
 
 Installation
