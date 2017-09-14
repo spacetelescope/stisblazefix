@@ -6,6 +6,14 @@
 stisblazefix Documentation
 ==========================
 
+.. warning::
+  
+  This package is currently in a pre--release state!
+  
+  Conda installation is not yet functional.
+  
+  Please note that AURA/STScI is not responsible for any damages resulting from the use of this software.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
