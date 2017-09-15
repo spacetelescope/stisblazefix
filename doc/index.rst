@@ -7,7 +7,7 @@ stisblazefix Documentation
 ==========================
 
 .. warning::
-  
+
   This package is currently in a pre--release state!
   
   Please note that AURA/STScI is not responsible for any damages resulting from the use of this software.
@@ -21,3 +21,12 @@ stisblazefix Documentation
   :undoc-members:
   :show-inheritance:
 
+Release History
+---------------
+
+* `v1.0a1`:  Initial pre-release of stisblazefix package.  Additional updates are pending.
+
+Support
+-------
+
+For support, please contact the STScI help desk at help<at>stsci<dot>edu.

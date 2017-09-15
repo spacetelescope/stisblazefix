@@ -33,6 +33,13 @@ This module contains required functions for the following scripts:
   * ``fluxfix`` takes a list of `x1d` fits files and generates corrected `x1f` files and diagnostic plots.
   * ``plotblaze`` plots the sensitivity curves for an extracted spectra.
 
+.. figure:: _static/e230h_example_revised.png
+
+   Example blaze correction to HST/STIS E230H dataset OCB6I2020.  See upcoming 
+   `STIS ISR 2017-XX`_ for details on the correction.
+
+.. _`STIS ISR 2017-XX`: http://www.stsci.edu/hst/stis/documents/isrs
+
 Installation
 ============
 
@@ -70,7 +77,7 @@ Alternatively, you may download_ and manually install ``stisblazefix`` via::
 
   python setup.py install
 
-.. _download: https://anaconda.org/sean-lockwood/stisblazefix/files
+.. _download: https://github.com/spacetelescope/stisblazefix/archive/master.zip
 
 Python API
 ==========
@@ -552,7 +559,8 @@ def cliprange(vector, fraclim=0.02, pad=0.125):
         
 def mkdqmask(dq,sdqflags=2604):
     '''Return mask vector set to zero wherever any bit set in the `dq` vector matches 
-    any bit set in ``sdqflags`` and to one elsewhere.  
+    any bit set in ``sdqflags`` and to one elsewhere.
+
 |   Default `sdqflags` = 4 + 8 + 32 + 512 + 2048 = 2604  
 |    = detector problem + data masked + large blemish + calibration defect + bad background
     '''
