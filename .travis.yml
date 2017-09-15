@@ -3,12 +3,12 @@ language: python
 # Setting sudo to false opts in to Travis-CI container-based builds.
 sudo: false
 
-#notifications:
-#  slack:
-#    rooms:
-#      - secure: "travis encrypt '<account>:<token>#channel'"
-#    on_success: change
-#    on_failure: always
+notifications:
+  slack:
+    rooms:
+      - secure: "RATbLEQKoSeavbEVRggKtrDflNfhi3I1gCvKaxLbVTg3VxrNSVxTDrv7OcmH4OwpEukHw+LRG1jlKN7CMF6NWuFSWb49iVX6XHPmaAjI69PB0dq335hvyxbox8hZdfew067j8wZwmibEvyuQkYCpZgJcI6keosuZ5kiwI1pFSIAxC8dpNWWpAmAUbCO9XVz3qwXqc96CC8nukECLKrh6K5osnfayTLpJSEtEuburfopp+xsYwU+ut3PK7ILRdZ0BrJNCEaXJ0GzOuOglehyaizeGHOK74mWIu0JBUE8fmorPpWmAVqVsIP0jKiYT5sasEAMd4KnMW5FyT+Q6YnDFVgfSiwov/TTA0RKXBt2PXkntd5MQKQvefkORXqGiYF+xFC/NaUvZFrFMMmoO+UY38g27Y50GrgsSl5aWDWtRYjBWxuWcH1IxHAr1ced9HSbBVMFL6FzUedabsBcOQSUi4pdC1NE+AWeIqp0+d3F5dKGONYDv4fJFtQy8DGlVIMYJ/ep7l4BZYhDW8peRwZMe9Lbgf6PBVrhiJnlXNdlm7UH16qHosq+tKhG9v7mrjXpIlQwTgqk2MFAegNn1KXBDvuX37162JRbZAFtXRxcz8p5SUCs2+HXJul/pUWutKnorptd0vpBnlpy1rrGPvO2ic7MT8TUyhhyQMrX4m0uf418="
+    on_success: change
+    on_failure: always
 
 os: linux
 
