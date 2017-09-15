@@ -74,6 +74,7 @@ class TestFluxFix(object):
         
         # Create a temporary directory:
         cls.tmpdir = tempfile.mkdtemp(prefix='tmp_stisblazefix_')
+        print('Version:  {}'.format(stisblazefix.__version__))
         print('Temporary directory:  {}'.format(cls.tmpdir))
         
         # Copy input and benchmark data into temporary directory:

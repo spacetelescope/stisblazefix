@@ -14,10 +14,6 @@
 # but can be added to an anaconda environment by first
 # activating the desired environment and then doing
 # conda install -c conda-forge lmfit
-#
-#NOTE: requires at least numpy 1.13, bugs occur with numpy 1.12
-#
-#Import using the command "import stisblazefix"
 
 
 '''
@@ -29,11 +25,11 @@ the shift to be applied to each echelle order is a linear function of the order 
 
 Once installed, the ``fixflux`` function of the module can be run by supplying a list of 
 STIS echelle `x1d` FITS file names, as well as an output name to be used for the PDF 
-diagnostic plots produced.  For example
+diagnostic plots produced.  For example:
 
 .. code-block:: python
 
-  stisblazefix.fluxfix(['ocb6i2020_x1d.fits', 'ocb6f2010_x1d.fits'], 'example.pdf)
+  stisblazefix.fluxfix(['ocb6i2020_x1d.fits', 'ocb6f2010_x1d.fits'], 'example.pdf')
 
 This will produce as output the files `ocb6i2020_x1f.fits` and `ocb6f2010_x1f.fits` with 
 corrected values for the extracted flux and error vectors, as well as a PDF file with a 
@@ -125,6 +121,7 @@ from lmfit import Parameters, Minimizer, conf_interval, minimize, printfuncs
 import datetime
 import os
 
+__version__ = '1.0a2'
 
 def fluxcorrect(filedata, pixshift):
     '''Recalculate and return corrected flux and error vectors, based on shifted blaze function.
@@ -134,25 +131,29 @@ def fluxcorrect(filedata, pixshift):
         It contains the shift of the blaze function in pixels as a function of relative spectral order.
     '''
 
-    origblaze = np.divide(filedata['net'], filedata['flux'])#back out original sensitivity
-    shape = np.shape(origblaze)
+    shape = np.shape(filedata['flux'])
+    origblaze = np.zeros(shape)
     newblaze = np.zeros(shape)
+    newflux = np.zeros(shape)
+    newerr = np.zeros(shape)
     order = 0
     pixnos = np.arange(shape[1])#shape[1] should always be 1024 for STIS
     while order < shape[0]:#number of orders
-        oldblaze=origblaze[order]
-        isgood=np.where(np.isfinite(oldblaze))
+        oldflux=filedata['flux'][order]
+        olderr=filedata['error'][order]
+        fixnet=filedata['net'][order]
+        oldblaze=0.*oldflux
+        isgood=np.where(oldflux != 0)
         if(np.size(isgood) > 1):
+            oldblaze[isgood[0]]=np.divide(fixnet[isgood[0]],oldflux[isgood[0]])
             f = interpolate.interp1d(pixnos[isgood[0]], oldblaze[isgood[0]], fill_value='extrapolate')
         else:
             f = interpolate.interp1d(pixnos,np.ones(np.size(pixnos)), fill_value='extrapolate')
+        origblaze[order] = f(pixnos)
         newblaze[order] = f(pixnos - pixshift[order])#shifts the blaze function
+        newflux[order] = np.divide(fixnet,newblaze[order])
+        newerr[order][isgood]=np.divide(olderr[isgood],oldflux[isgood])*newflux[order][isgood]
         order += 1
-    newflux = np.divide(filedata['net'], newblaze)
-    #newerr = np.divide(filedata['net_error'], newblaze)  # need to handle case where net_error column is missing
-    newerr = np.divide(filedata['error'],filedata['flux'])*newflux
-    isbad = np.where(np.isnan(newerr) | np.isnan(newerr))
-    newerr[isbad] = 0.0
     return (newflux, newerr)
 
 def residcalc(filedata, flux=None, err=None, dq=None, ntrim=5):
