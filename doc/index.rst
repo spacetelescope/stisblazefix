@@ -20,6 +20,7 @@ stisblazefix Documentation
   :members:
   :undoc-members:
   :show-inheritance:
+  :exclude-members: cliprange, genexplot, mkdqmask
 
 Release History
 ---------------

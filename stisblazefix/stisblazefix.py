@@ -20,23 +20,31 @@
 #Import using the command "import stisblazefix"
 
 
-'''This module contains a variety of functions to correct the blaze function in HST/STIS
-echelle modes. It is intended for use with `x1d` FITS files. Most users will be interested 
-in the ``fluxfix`` function.
+'''
+The ``stisblazefix`` python module is designed to empirically correct STIS echelle data 
+for misalignment in the blaze function.  It does this by shifting the overall sensitivity 
+curve applied to each order to find the shifts that make the measured flux in the 
+wavelength overlap of adjacent echelle orders most consistent, under the assumption that 
+the shift to be applied to each echelle order is a linear function of the order number.
 
-This module contains required functions for the following scripts:
-  * ``fluxcorrect`` takes a shift to the blaze function and recalculates the flux and error.
-  * ``residcalc`` takes an echelle spectrum and calculates the flux residuals for the overlapping region.
-  * ``generateplot`` takes an old and corrected spectrum and generates a diagnostic plot.
-  * ``residfunc`` is a wrapper for lmfit minimizer.
-  * ``findshift`` calculates the shift to the blaze function that best aligns the spectrum.
-  * ``fluxfix`` takes a list of `x1d` fits files and generates corrected `x1f` files and diagnostic plots.
-  * ``plotblaze`` plots the sensitivity curves for an extracted spectra.
+Once installed, the ``fixflux`` function of the module can be run by supplying a list of 
+STIS echelle `x1d` FITS file names, as well as an output name to be used for the PDF 
+diagnostic plots produced.  For example
+
+.. code-block:: python
+
+  stisblazefix.fluxfix(['ocb6i2020_x1d.fits', 'ocb6f2010_x1d.fits'], 'example.pdf)
+
+This will produce as output the files `ocb6i2020_x1f.fits` and `ocb6f2010_x1f.fits` with 
+corrected values for the extracted flux and error vectors, as well as a PDF file with a 
+diagnostic plot for each exposure showing changes made to the data.
 
 .. figure:: _static/e230h_example_revised.png
 
-   Example blaze correction to HST/STIS E230H dataset OCB6I2020.  See upcoming 
-   `STIS ISR 2017-XX`_ for details on the correction.
+   Example blaze correction to HST/STIS E230H dataset OCB6I2020.
+
+.. seealso::
+  See the upcoming `STIS ISR 2017-XX`_ for details on the correction.
 
 .. _`STIS ISR 2017-XX`: http://www.stsci.edu/hst/stis/documents/isrs
 
@@ -63,6 +71,16 @@ then running::
 
   Requires at least numpy 1.13, bugs occur with numpy 1.12.
 
+.. Note::
+
+  If it is necessary or desirable to install this module in a conda environment that does 
+  not include the AstroConda software channel, it may be possible as long as compatible 
+  versions of Astropy_ and Matplotlib_ are available.
+
+.. _Astropy: http://www.astropy.org
+.. _Matplotlib: http://matplotlib.org
+
+
 Conda Installation
 ------------------
 
@@ -81,6 +99,18 @@ Alternatively, you may download_ and manually install ``stisblazefix`` via::
 
 Python API
 ==========
+
+Most users will be interested in the ``fluxfix`` function.
+
+This module contains the following functions:
+  * ``findshift``   : calculates the shift to the blaze function that best aligns the spectrum.
+  * ``fluxcorrect`` : takes a shift to the blaze function and recalculates the flux and error.
+  * ``fluxfix``     : takes a list of `x1d` fits files and generates corrected `x1f` files and diagnostic plots.
+  * ``generateplot``: takes an old and corrected spectrum and generates a diagnostic plot.
+  * ``plotblaze``   : plots the sensitivity curves for an extracted spectrum.
+  * ``residfunc``   : wrapper for lmfit minimizer.
+  * ``residcalc``   : calculates the flux residuals for the overlapping regions of an echelle spectrum.
+
 '''
 
 from astropy.io import fits
@@ -288,10 +318,10 @@ def genexplot(origdata, newflux, newerr, wav1, wav2, ntrim=0):
     and pixshift vs relative spectral order.
     Return a figure object.
     
-    ``origdata``: the data attribute of an `x1d` FITS file. This should contain the original flux.  
-    ``newflux`` : the corrected flux.  
-    ``newerr``  : the corrected error.  
-    ``pixshift``: a 1D vector with length equal to the number of orders in the echelle spectrum.
+    * ``origdata``: the data attribute of an `x1d` FITS file. This should contain the original flux.
+    * ``newflux`` : the corrected flux.
+    * ``newerr``  : the corrected error.
+    * ``pixshift``: a 1D vector with length equal to the number of orders in the echelle spectrum.
     
     kwargs:  
       * ``ntrim`` is a cut made to the edges of the orders to avoid various edge problems. Defaults to 5.
