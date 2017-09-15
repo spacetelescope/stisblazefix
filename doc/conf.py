@@ -127,7 +127,6 @@ html_sidebars = {
     ]
 }
 
-
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
@@ -138,20 +137,19 @@ htmlhelp_basename = 'stisblazefixdoc'
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-
+    'papersize': 'letterpaper',
+    
+    # Remove blank pages
+    'classoptions': ',openany,oneside', 
+    
     # The font size ('10pt', '11pt' or '12pt').
-    #
     # 'pointsize': '10pt',
 
     # Additional stuff for the LaTeX preamble.
-    #
     # 'preamble': '',
 
     # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
+    'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -162,6 +160,7 @@ latex_documents = [
      'Malinda Baer, Charles Proffitt', 'manual'),
 ]
 
+latex_domain_indices = False  # No module index
 
 # -- Options for manual page output ---------------------------------------
 
