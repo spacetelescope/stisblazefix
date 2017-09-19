@@ -1,6 +1,6 @@
 package:
   name: stisblazefix
-  version: v1.0a
+  version: 1.0a2
 
 source:
   path: .
