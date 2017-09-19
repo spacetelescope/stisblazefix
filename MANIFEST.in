@@ -2,7 +2,9 @@ include LICENSE.txt
 include README.md
 include setup.py
 include stisblazefix/*.py
-include stisblazefix/testdata/*.fits
+exclude test_sbf.py
+exclude stisblazefix/testdata
+exclude stisblazefix/testdata/*.fits
 global-exclude *.pyc
 exclude stisblazefix.egg-info
 exclude runall.py
