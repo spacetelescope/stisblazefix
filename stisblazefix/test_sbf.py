@@ -19,7 +19,7 @@ def determine_x1dlist(tmpdir):
     x1dlist = ['o3zx02070_x1d.fits', 'o4vt02040_x1d.fits', 'ocb6f1020_x1d.fits', 'ocb6i2020_x1d.fits']
     '''
     
-    testdata_str = os.path.join(os.path.expanduser('~'), 'stisblazefix', 'stisblazefix', 'testdata', '*.fits')
+    testdata_str = os.path.join(os.path.expanduser('~'), 'spacetelescope', 'stisblazefix', 'stisblazefix', 'testdata', '*.fits')
     testdata = glob.glob(testdata_str)
     if len(testdata) == 0:
         raise FileError('Couldn\'t find test *_x1d.fits files in {}\nor package default in {}'.format(
