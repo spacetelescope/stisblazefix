@@ -26,7 +26,7 @@ Release History
 ---------------
 
 * `v1.0a1`:  Initial pre-release of stisblazefix package.  Additional updates are pending.
-* `v1.0a2`:  Improved handling of divide-by-zero warnings.
+* `v1.0a2`:  Improved handling of divide-by-zero warnings.  Reduced `conda` package size.
 
 Support
 -------
