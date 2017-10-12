@@ -23,7 +23,7 @@ curve applied to each order to find the shifts that make the measured flux in th
 wavelength overlap of adjacent echelle orders most consistent, under the assumption that 
 the shift to be applied to each echelle order is a linear function of the order number.
 
-Once installed, the ``fixflux`` function of the module can be run by supplying a list of 
+Once installed, the ``fluxfix`` function of the module can be run by supplying a list of 
 STIS echelle `x1d` FITS file names, as well as an output name to be used for the PDF 
 diagnostic plots produced.  For example:
 
