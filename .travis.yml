@@ -46,7 +46,7 @@ install:
     - conda install -n root conda-build
 
     # Create and activate test environment:
-    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION nose #coverage
+    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION nose coverage
     - source activate test-environment
 
     # Add external dependency to LMFIT:
@@ -57,7 +57,7 @@ install:
     - conda install stisblazefix --use-local
 
     # Install coverage tool:
-    #- pip install coveralls
+    - pip install coveralls
 
 before_script:
     # From https://docs.travis-ci.com/user/gui-and-headless-browsers
@@ -66,8 +66,7 @@ before_script:
     - sleep 3 # give xvfb some time to start
 
 script:
-    #- coverage run --omit='*test*' $(which nosetests) -v stisblazefix/unit_tests.py
-    - nosetests -v stisblazefix/test_sbf.py
+    - coverage run --omit='*test*' $(which nosetests) -v stisblazefix/test_sbf.py
 
 #after_success:
-#    - coveralls
+    - coveralls

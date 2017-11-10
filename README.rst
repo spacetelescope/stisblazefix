@@ -5,7 +5,7 @@ Correction for the HST/STIS echelle blaze function.
 
 See documentation at https://stisblazefix.readthedocs.io
 
-|build-status| |docs| |conda|
+|build-status| |coverage| |docs| |conda| 
 
 This module contains a variety of functions to correct the blaze function in HST STIS
 echelle modes. It is intended for use with STIS echelle x1d fits files.
@@ -34,6 +34,9 @@ Additional fixes by C. Proffitt Aug-Sep 2017
     :alt: build status
     :scale: 100%
     :target: https://travis-ci.org/spacetelescope/stisblazefix
+
+.. |coverage| image:: https://coveralls.io/repos/github/spacetelescope/stisblazefix/badge.svg?branch=master
+    :target: https://coveralls.io/github/spacetelescope/stisblazefix?branch=master
 
 .. |docs| image:: https://readthedocs.org/projects/stisblazefix/badge/
     :alt: Documentation Status
