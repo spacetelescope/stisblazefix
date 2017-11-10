@@ -68,5 +68,5 @@ before_script:
 script:
     - coverage run --omit='*test*' $(which nosetests) -v stisblazefix/test_sbf.py
 
-#after_success:
+after_success:
     - coveralls
