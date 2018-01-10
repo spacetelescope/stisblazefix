@@ -40,9 +40,9 @@ diagnostic plot for each exposure showing changes made to the data.
    Example blaze correction to HST/STIS E230H dataset OCB6I2020.
 
 .. seealso::
-  See the upcoming `STIS ISR 2017-XX`_ for details on the correction.
+  See `STIS ISR 2018-01`_ for details on the correction.
 
-.. _`STIS ISR 2017-XX`: http://www.stsci.edu/hst/stis/documents/isrs
+.. _`STIS ISR 2018-01`: http://www.stsci.edu/hst/stis/documents/isrs/2018_01.pdf
 
 Installation
 ============
