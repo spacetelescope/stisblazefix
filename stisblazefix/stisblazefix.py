@@ -121,7 +121,7 @@ from lmfit import Parameters, Minimizer, conf_interval, minimize, printfuncs
 import datetime
 import os
 
-__version__ = '1.0a2'
+__version__ = '1.1'
 
 def fluxcorrect(filedata, pixshift):
     '''Recalculate and return corrected flux and error vectors, based on shifted blaze function.
@@ -397,8 +397,8 @@ def findshift(filedata, guess, iterate=True):
     params = Parameters()
     params.add('a', value=guess[0])
     params.add('b', value=guess[1])
-    if not(iterate):
-        params['a'].vary, params['b'].vary = False, False
+    if not iterate:
+        return (guess[0] + guess[1]*x, guess, (np.nan, np.nan))
     min = minimize(residfunc, params, args=(x, filedata))
     #include diagnostics and throw warnings
     a = (min.params['a'].value, min.params['a'].stderr)
