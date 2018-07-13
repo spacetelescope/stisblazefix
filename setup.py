@@ -10,7 +10,7 @@ with open(os.path.join(here, 'README.rst')) as f:
 setup(
     name = 'stisblazefix',
     url = 'http://www.stsci.edu/instruments/stis/',
-    version = '1.0a2',
+    version = '1.1',
     description = 'HST/STIS echelle blaze function correction',
     long_description = long_description,
     author = 'M. Baer, C. Proffitt',
