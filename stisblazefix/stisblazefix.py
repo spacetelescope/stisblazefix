@@ -468,7 +468,7 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):
          with `x1f`.
        * A multipage PDF file with diagnostic plots for each exposure.
 
-    .. _CalSTIS: http://ssb.stsci.edu/doc/stsci_python_dev/stistools.doc/html/calstis.html
+    .. _CalSTIS: https://stistools.readthedocs.io/en/latest/calstis.html
     '''
     if guess is None:
         guess=(1, 0.5)
