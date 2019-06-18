@@ -30,4 +30,4 @@ Release History
 Support
 -------
 
-For support, please contact the STScI help desk at help<at>stsci<dot>edu.
+For support, please contact the STScI help desk at http://hsthelp.stsci.edu
