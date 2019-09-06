@@ -121,7 +121,9 @@ from lmfit import Parameters, Minimizer, conf_interval, minimize, printfuncs
 import datetime
 import os
 
-__version__ = '1.1'
+plt.rc('text', usetex=False)  # Removes dependency on LaTeX installation
+
+__version__ = '1.2'
 
 def fluxcorrect(filedata, pixshift):
     '''Recalculate and return corrected flux and error vectors, based on shifted blaze function.
