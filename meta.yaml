@@ -16,7 +16,6 @@ requirements:
     - scipy
     - astropy
     - matplotlib
-    #- lmfit
 
 about:
   #home: http://stisblazefix.readthedocs.io

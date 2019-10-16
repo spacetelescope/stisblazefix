@@ -22,6 +22,7 @@ setup(
     classifiers = ['Programming Language :: Python',
                    'Programming Language :: Python :: 2.7',
                    'Programming Language :: Python :: 3.6',
+                   'Programming Language :: Python :: 3.7',
                    'Development Status :: 3 - Alpha',
                    'Operating System :: OS Independent',
                    'Intended Audience :: Science/Research',
@@ -31,7 +32,7 @@ setup(
                    'Topic :: Software Development :: Libraries :: Python Modules'],
     packages = ['stisblazefix'],
     install_requires = ['setuptools', 'numpy>=1.13', 'scipy', 'astropy', 'matplotlib', \
-        'lmfit', 'datetime'],
+        'datetime'],
     package_data = {'stisblazefix': ['testdata/*.fits']},
     #entry_points={
     #      'console_scripts': ['stisblazefix = stisblazefix.stisblazefix:fluxfix']},
