@@ -8,12 +8,7 @@
 #
 #
 #This module requires:
-#numpy, scipy, astropy, matplotlib, lmfit
-
-# LMFIT is not in the standard astroconda distribution,
-# but can be added to an anaconda environment by first
-# activating the desired environment and then doing
-# conda install -c conda-forge lmfit
+#numpy, scipy, astropy, matplotlib
 
 
 '''
@@ -37,7 +32,7 @@ diagnostic plot for each exposure showing changes made to the data.
 
 .. figure:: _static/e230h_example_revised.png
 
-   Example blaze correction to HST/STIS E230H dataset OCB6I2020.
+   Example blaze correction to HST/STIS E230H dataset `OCB6I2020`.
 
 .. seealso::
   See `STIS ISR 2018-01`_ for details on the correction.
@@ -57,12 +52,6 @@ installation, launch it via::
 
 .. _AstroConda: http://astroconda.readthedocs.io
 
-``LMFIT`` is required, but is not currently in the standard ``AstroConda`` distribution.  
-It can be added to an Anaconda environment by first activating the desired environment and 
-then running::
-
-  conda install -c conda-forge lmfit
-
 .. WARNING::
 
   Requires at least numpy 1.13, bugs occur with numpy 1.12.
@@ -80,7 +69,7 @@ then running::
 Conda Installation
 ------------------
 
-Once ``LMFIT`` is installed, install the ``stisblazefix`` module via::
+Install the ``stisblazefix`` module via::
 
   conda install -c sean-lockwood stisblazefix
 
@@ -104,7 +93,7 @@ This module contains the following functions:
   * ``fluxfix``     : takes a list of `x1d` fits files and generates corrected `x1f` files and diagnostic plots.
   * ``generateplot``: takes an old and corrected spectrum and generates a diagnostic plot.
   * ``plotblaze``   : plots the sensitivity curves for an extracted spectrum.
-  * ``residfunc``   : wrapper for lmfit minimizer.
+  * ``residfunc``   : wrapper for `scipy.optimize.least_squares` minimizer.
   * ``residcalc``   : calculates the flux residuals for the overlapping regions of an echelle spectrum.
 
 '''
@@ -117,7 +106,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.text as txt
-from lmfit import Parameters, Minimizer, conf_interval, minimize, printfuncs
+from scipy.optimize import least_squares
 import datetime
 import os
 
@@ -156,7 +145,7 @@ def fluxcorrect(filedata, pixshift):
         newflux[order] = np.divide(fixnet,newblaze[order])
         newerr[order][isgood]=np.divide(olderr[isgood],oldflux[isgood])*newflux[order][isgood]
         order += 1
-    return (newflux, newerr)
+    return newflux, newerr
 
 def residcalc(filedata, flux=None, err=None, dq=None, ntrim=5):
     '''Calculate and return the flux overlap residuals and weighted error.
@@ -364,30 +353,28 @@ def genexplot(origdata, newflux, newerr, wav1, wav2, ntrim=0):
     return fig
 
 def residfunc(pars, x, filedata):
-    # function for lmfit - is there way to add loop for linear/0th/quadratic? - try adjusting number of parameters
-    '''Wrapper for `lmfit` minimizer.
+    # function for scipy.optimize.least_squares - is there way to add loop for linear/0th/quadratic? - try adjusting number of parameters
+    '''Wrapper for `scipy.optimize.least_squares` minimizer.
     Return weighted residuals for a given pixshift.
 
-    * ``pars``    : a tuple containing `lmfit` parameters.  
+    * ``pars``    : a tuple containing `least_squares` parameters.
     * ``x``       : the input variable, in this case relative spectral order.  
     * ``filedata``: the data attribute of an `x1d` FITS file.
     '''
-    a = pars['a'].value
-    b = pars['b'].value
+    a = pars[0]
+    b = pars[1]
     pixshift = a + b*x
-    new = fluxcorrect(filedata, pixshift)
-    newflux = new[0]
-    newerr = new[1]
-    temp = residcalc(filedata, flux=newflux, err=newerr)#(resid, residerr)
-    wresids = np.abs(np.divide(temp[0], temp[1]))#weighted resid = resid/sig
+    newflux, newerr = fluxcorrect(filedata, pixshift)
+    temp = residcalc(filedata, flux=newflux, err=newerr)  # (resid, residerr)
+    wresids = np.abs(np.divide(temp[0], temp[1]))  # weighted resid = resid/sig
     return wresids
     
 def findshift(filedata, guess, iterate=True):
     '''Find pixshift that best aligns spectral orders.
 
-    Use `lmfit` to calculate the pixshift (to apply to the blaze function) as a linear 
-    function of relative spectral order that minimizes the flux overlap residuals
-    as calculated in `residcalc`.
+    Use `scipy.optimize.least_squares` to calculate the pixshift (to apply to the blaze 
+    function) as a linear function of relative spectral order that minimizes the flux 
+    overlap residuals as calculated in `residcalc`.
 
     * ``filedata``: the data attribute of an `x1d` FITS file.  
     * ``guess``   : a tuple containing the starting parameters for the fit.  
@@ -396,15 +383,14 @@ def findshift(filedata, guess, iterate=True):
     Returns `pixshift`, the error in the `pixshift`, and the final parameters.
     '''
     x = np.arange(np.shape(filedata)[0])
-    params = Parameters()
-    params.add('a', value=guess[0])
-    params.add('b', value=guess[1])
+
     if not iterate:
         return (guess[0] + guess[1]*x, guess, (np.nan, np.nan))
-    min = minimize(residfunc, params, args=(x, filedata))
+    min = least_squares(residfunc, guess, args=(x, filedata), method='lm')
+    print ('*** X:  ', min.x)
     #include diagnostics and throw warnings
-    a = (min.params['a'].value, min.params['a'].stderr)
-    b = (min.params['b'].value, min.params['b'].stderr)
+    a = (min.x[0], np.nan)
+    b = (min.x[1], np.nan)
     pixshift = a[0] + (b[0])*x
     pixerr = np.sqrt(a[1]**2 + (x * b[1])**2)
     return (pixshift, (a[0], b[0]), (a[1], b[1]))
@@ -493,10 +479,9 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):
         while i < extno:#for i, extension in enumerate(file, start=1):#while i < extno:
             filedata = file[i].data
             hdri = file[i].header
-            shift = findshift(filedata, guess, iterate=iterate)
-            pixshift, params, paramerr = shift[0], shift[1], shift[2]
-            new = fluxcorrect(filedata, pixshift)
-            newflux, newerr = new[0], new[1]
+            pixshift, params, paramerr = findshift(filedata, guess, iterate=iterate)
+            
+            newflux, newerr = fluxcorrect(filedata, pixshift)
             graph, oldresids, oldresiderr, newresids, newresiderr = generateplot(filedata, newflux, newerr, pixshift, params, paramerr)
             (plt.suptitle(hdr['rootname']+' ext. '+str(i)+', '+hdr['targname']      
                 +', '+hdr['opt_elem']+' '+str(hdr['CENWAVE'])+' '+hdr['propaper']  
@@ -523,7 +508,7 @@ def fluxfix(files, pdfname, guess=None, iterate=True, nxplot=1, **kwargs):
                     plt.close()
             file[i].data['flux'] = newflux
             file[i].data['error'] = newerr
-            pixshift, (acof,bcof), (acoferr,bcoferr) = shift
+            pixshift, (acof,bcof), (acoferr,bcoferr) = pixshift, params, paramerr
             outdata = {'pixshift': pixshift,
                 'acof': acof,
                 'bcof': bcof,

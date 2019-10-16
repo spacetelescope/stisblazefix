@@ -23,7 +23,7 @@ def determine_x1dlist(tmpdir):
     testdata = glob.glob(testdata_str)
     if len(testdata) == 0:
         raise IOError('Couldn\'t find test *_x1d.fits files in {}\nor package default in {}'.format(
-            ref_dir, os.path.dirname(testdata_str)))
+            tmpdir, os.path.dirname(testdata_str)))
     testdata.sort()
     
     # Copy data to temporary directory:
