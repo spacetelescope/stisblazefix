@@ -40,7 +40,7 @@ jobs:
       - name: Run stisblazefix unit tests
         run: |
           cd $RUNNER_WORKSPACE
-          sudo conda create --yes --prefix ./envs python=3.7
+          sudo conda create --yes --prefix ./envs python=$python-version
           eval "$(${CONDA}/bin/conda shell.bash hook)"
           source activate ./envs
           cd stisblazefix/
