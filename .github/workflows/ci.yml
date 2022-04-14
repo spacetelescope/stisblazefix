@@ -4,36 +4,36 @@ on: [push, pull_request]
 
 jobs:
 
-  environment-installation:
-
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: [3.7, 3.8]
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Test stisblazefix environment installation
-        run: |
-          cd $RUNNER_WORKSPACE
-          sudo conda create --yes --prefix ./envs python=3.7
-          eval "$(${CONDA}/bin/conda shell.bash hook)"
-          source activate ./envs
-          cd stisblazefix/
-          sudo conda env update -f doc/environment.yml
-          conda activate stisblazefix
-          pip install -e .
-          python -c "import stisblazefix"
-        shell: bash
+  #environment-installation:
+  #
+  #  runs-on: ${{ matrix.os }}
+  #  strategy:
+  #    matrix:
+  #      os: [ubuntu-latest, macos-latest]
+  #      python-version: [3.7, 3.8]
+  #
+  #  steps:
+  #    - uses: actions/checkout@v2
+  #    - name: Test stisblazefix environment installation
+  #      run: |
+  #        cd $RUNNER_WORKSPACE
+  #        sudo conda create --yes --prefix ./envs python=3.7
+  #        eval "$(${CONDA}/bin/conda shell.bash hook)"
+  #        source activate ./envs
+  #        cd stisblazefix/
+  #        sudo conda env update -f doc/environment.yml
+  #        conda activate stisblazefix
+  #        pip install -e .
+  #        python -c "import stisblazefix"
+  #      shell: bash
 
   unit-tests:
 
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: [3.7, 3.8]
+        os: [ubuntu-latest]  #, macos-latest]
+        python-version: [3.8]  #, 3.7]
 
     steps:
       - uses: actions/checkout@v2
