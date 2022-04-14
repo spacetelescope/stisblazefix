@@ -37,17 +37,34 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Run stisblazefix unit tests
+      - uses: conda-incubator/setup-miniconda@v2
         with:
+          activate-environment: stisblazefix-env
+          environment-file: doc/environment.yml
+          auto-activate-base: false
+          auto-update-conda: true
           python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          allow-softlinks: true
+          channel-priority: flexible
+          show-channel-urls: true
+      - name: conda info
+        shell: bash -l {0}
         run: |
-          cd $RUNNER_WORKSPACE
-          sudo conda create --yes --prefix ./envs python=${{ matrix.python-version }}
-          eval "$(${CONDA}/bin/conda shell.bash hook)"
-          source activate ./envs
-          cd stisblazefix/
-          sudo conda env update -f doc/environment.yml
-          conda activate stisblazefix
-          pip install -e .
-          pytest stisblazefix/
-        shell: bash
+          conda info
+          conda list
+
+      #- name: Run stisblazefix unit tests
+      #  with:
+      #    python-version: ${{ matrix.python-version }}
+      #  run: |
+      #    cd $RUNNER_WORKSPACE
+      #    sudo conda create --yes --prefix ./envs python=${{ matrix.python-version }}
+      #    eval "$(${CONDA}/bin/conda shell.bash hook)"
+      #    source activate ./envs
+      #    cd stisblazefix/
+      #    sudo conda env update -f doc/environment.yml
+      #    conda activate stisblazefix
+      #    pip install -e .
+      #    pytest stisblazefix/
+      #  shell: bash
