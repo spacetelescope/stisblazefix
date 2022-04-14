@@ -57,7 +57,7 @@ def compare_results(x1fs, x1fs_benchmark):
         with fits.open(x1f) as output, fits.open(x1f_benchmark) as benchmark:
             for col in ['FLUX', 'ERROR']:
                 print('    ', col)
-                assert_allclose(output[1].data[col], benchmark[1].data[col], rtol=1e-4, atol=1e-18)
+                assert_allclose(output[1].data[col], benchmark[1].data[col], rtol=1e-3, atol=1e-12)
 
 class TestFluxFix(object):
     @classmethod

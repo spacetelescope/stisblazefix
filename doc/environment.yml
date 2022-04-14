@@ -7,6 +7,6 @@ dependencies:
   - matplotlib
   - astropy
   - scipy
-  - stistools
   - asteval=0.9.12
   - lmfit
+  - pytest

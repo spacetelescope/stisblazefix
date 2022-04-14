@@ -1,0 +1,40 @@
+name: stisblazefix CI
+
+on: [push, pull_request]
+
+jobs:
+
+  unit-tests:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10"]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: stisblazefix-env
+          environment-file: doc/environment.yml
+          auto-activate-base: false
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          allow-softlinks: true
+          channel-priority: flexible
+          show-channel-urls: true
+      - name: install package
+        shell: bash -l {0}
+        run: |
+          pip install -e .
+      - name: conda info
+        shell: bash -l {0}
+        run: |
+          conda info
+          conda list
+      - name: Run stisblazefix unit tests
+        shell: bash -l {0}
+        run: |
+          pytest stisblazefix/
