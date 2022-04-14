@@ -48,6 +48,10 @@ jobs:
           allow-softlinks: true
           channel-priority: flexible
           show-channel-urls: true
+      - name: install package
+        shell: bash -l {0}
+        run: |
+          pip install -e .
       - name: conda info
         shell: bash -l {0}
         run: |
