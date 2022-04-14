@@ -30,10 +30,10 @@ Additional fixes by C. Proffitt Aug-Sep 2017
 
    <br />
 
-.. |build-status| image:: https://travis-ci.org/spacetelescope/stisblazefix.svg?branch=master
+.. |build-status| image:: https://github.com/spacetelescope/stisblazefix/actions/workflows/ci.yml/badge.svg?branch=master
     :alt: build status
     :scale: 100%
-    :target: https://travis-ci.org/spacetelescope/stisblazefix
+    :target: https://github.com/spacetelescope/stisblazefix/actions/workflows/ci.yml
 
 .. |coverage| image:: https://coveralls.io/repos/github/spacetelescope/stisblazefix/badge.svg?branch=master
     :target: https://coveralls.io/github/spacetelescope/stisblazefix?branch=master
