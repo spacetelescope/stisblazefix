@@ -53,6 +53,10 @@ jobs:
         run: |
           conda info
           conda list
+      - name: pytests
+        shell: bash -l {0}
+        run: |
+          pytest stisblazefix/
 
       #- name: Run stisblazefix unit tests
       #  with:
