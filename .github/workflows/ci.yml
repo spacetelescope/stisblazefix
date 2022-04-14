@@ -38,9 +38,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run stisblazefix unit tests
+        with:
+          python-version: ${{ matrix.python-version }}
         run: |
           cd $RUNNER_WORKSPACE
-          sudo conda create --yes --prefix ./envs python=${python-version}
+          sudo conda create --yes --prefix ./envs python=${{ matrix.python-version }}
           eval "$(${CONDA}/bin/conda shell.bash hook)"
           source activate ./envs
           cd stisblazefix/
