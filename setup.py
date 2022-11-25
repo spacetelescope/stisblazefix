@@ -25,6 +25,7 @@ setup(
                    'Programming Language :: Python :: 3.8',
                    'Programming Language :: Python :: 3.9',
                    'Programming Language :: Python :: 3.10',
+                   'Programming Language :: Python :: 3.11',
                    'Development Status :: 5 - Production/Stable',
                    'Operating System :: OS Independent',
                    'Intended Audience :: Science/Research',
