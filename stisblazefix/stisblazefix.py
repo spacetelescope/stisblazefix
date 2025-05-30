@@ -10,11 +10,6 @@
 #This module requires:
 #numpy, scipy, astropy, matplotlib, lmfit
 
-# LMFIT is not in the standard astroconda distribution,
-# but can be added to an anaconda environment by first
-# activating the desired environment and then doing
-# conda install -c conda-forge lmfit
-
 
 '''
 The ``stisblazefix`` python module is designed to empirically correct STIS echelle data 
@@ -31,7 +26,7 @@ diagnostic plots produced.  For example:
 
   stisblazefix.fluxfix(['ocb6i2020_x1d.fits', 'ocb6f2010_x1d.fits'], 'example.pdf')
 
-This will produce as output the files `ocb6i2020_x1f.fits` and `ocb6f2010_x1f.fits` with 
+This will produce as output the files ``ocb6i2020_x1f.fits`` and ``ocb6f2010_x1f.fits`` with 
 corrected values for the extracted flux and error vectors, as well as a PDF file with a 
 diagnostic plot for each exposure showing changes made to the data.
 
@@ -42,54 +37,30 @@ diagnostic plot for each exposure showing changes made to the data.
 .. seealso::
   See `STIS ISR 2018-01`_ for details on the correction.
 
-.. _`STIS ISR 2018-01`: http://www.stsci.edu/hst/stis/documents/isrs/2018_01.pdf
+.. _`STIS ISR 2018-01`: https://www.stsci.edu/files/live/sites/www/files/home/hst/instrumentation/stis/documentation/instrument-science-reports/_documents/2018_01.pdf
 
 Installation
 ============
 
+The ``stisblazefix`` package has been updated to install via pip::
+
+  pip install stisblazefix
+
 Dependencies
 ------------
 
-The ``stisblazefix`` package is designed to run in the AstroConda_ environment.  After 
-installation, launch it via::
-
-  source activate astroconda
-
-.. _AstroConda: http://astroconda.readthedocs.io
-
-``LMFIT`` is required, but is not currently in the standard ``AstroConda`` distribution.  
-It can be added to an Anaconda environment by first activating the desired environment and 
-then running::
-
-  conda install -c conda-forge lmfit
+It requires ``numpy``, ``scipy``, ``astropy``, ``matplotlib``, ``lmfit``.
 
 .. WARNING::
 
-  Requires at least numpy 1.13, bugs occur with numpy 1.12.
-
-.. Note::
-
-  If it is necessary or desirable to install this module in a conda environment that does 
-  not include the AstroConda software channel, it may be possible as long as compatible 
-  versions of Astropy_ and Matplotlib_ are available.
-
-.. _Astropy: http://www.astropy.org
-.. _Matplotlib: http://matplotlib.org
-
-
-Conda Installation
-------------------
-
-Once ``LMFIT`` is installed, install the ``stisblazefix`` module via::
-
-  conda install -c sean-lockwood stisblazefix
+  Requires at least numpy 1.13; bugs occur with numpy 1.12.
 
 Manual Installation
 -------------------
 
 Alternatively, you may download_ and manually install ``stisblazefix`` via::
 
-  python setup.py install
+  pip install .
 
 .. _download: https://github.com/spacetelescope/stisblazefix/archive/master.zip
 
@@ -121,7 +92,6 @@ from lmfit import Parameters, Minimizer, conf_interval, minimize, printfuncs
 import datetime
 import os
 
-__version__ = '1.1'
 
 def fluxcorrect(filedata, pixshift):
     '''Recalculate and return corrected flux and error vectors, based on shifted blaze function.
@@ -575,7 +545,7 @@ def plotblaze(filename, pdfname, ntrim=7):
     pdf.close()
 
 def cliprange(vector, fraclim=0.02, pad=0.125):
-    ''' For a vector first find the limits, :math:`v_0` and :math:`v_1`, on the value that 
+    r''' For a vector first find the limits, :math:`v_0` and :math:`v_1`, on the value that 
     includes from fraclim to 1 - fraclim of the pixels.  
     Then expand that range on both the lower and upper end by an amount :math:`\mbox{pad}*(v_1-v_0)`
     '''

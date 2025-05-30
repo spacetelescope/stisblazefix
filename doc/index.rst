@@ -1,7 +1,5 @@
 .. stisblazefix documentation master file, created by
    sphinx-quickstart on Mon Sep 11 12:55:49 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
 stisblazefix Documentation
 ==========================
@@ -26,8 +24,9 @@ Release History
 * `v1.0a1`:  Initial pre-release of stisblazefix package.  Additional updates are pending.
 * `v1.0a2`:  Improved handling of divide-by-zero warnings.  Reduced `conda` package size.
 * `v1.1`:  Fixed bug in lmfit dependency call when iterate=False.
+* `v1.2`:  Updated packaging with pyproject.toml and pip installation.
 
 Support
 -------
 
-For support, please contact the STScI help desk at http://hsthelp.stsci.edu
+For support, please contact the STScI help desk at https://hsthelp.stsci.edu
