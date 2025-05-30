@@ -42,7 +42,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 docs = ["sphinx"]
-tests = [
+test = [
     "pytest",
     "pytest-cov"
 ]
