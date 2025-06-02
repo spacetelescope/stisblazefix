@@ -55,6 +55,7 @@ python_files = ["test_*.py"]
 
 [project.urls]
 Homepage = "https://www.stsci.edu/hst/instrumentation/stis"
+Documentation = "https://stisblazefix.readthedocs.io"
 Support = "https://hsthelp.stsci.edu"
 
 [tool.setuptools]
