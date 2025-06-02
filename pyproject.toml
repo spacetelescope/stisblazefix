@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=61", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stisblazefix"
+description = "HST/STIS echelle blaze function correction"
+readme = "README.rst"
+license = { file = "LICENSE.txt" }
+authors = [
+    { name = "M. Baer" },
+    { name = "C. Proffitt" },
+]
+maintainers = [
+    { name = "Sean Lockwood" }
+]
+requires-python = ">=3.9"
+keywords = ["astronomy"]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+dependencies = [
+    "numpy>=1.13",
+    "scipy",
+    "astropy",
+    "matplotlib",
+    "lmfit"
+]
+dynamic = ["version"]
+
+
+[project.optional-dependencies]
+docs = ["sphinx"]
+test = [
+    "pytest",
+    "pytest-cov"
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov=stisblazefix --cov-report=term --cov-fail-under=80"
+testpaths = ["stisblazefix"]
+python_files = ["test_*.py"]
+
+[project.urls]
+Homepage = "https://www.stsci.edu/hst/instrumentation/stis"
+Support = "https://hsthelp.stsci.edu"
+
+[tool.setuptools]
+packages = ["stisblazefix"]
+
+[tool.setuptools.package-data]
+"stisblazefix" = ["testdata/*.fits"]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "node-and-date"
+write_to = "stisblazefix/_version.py"

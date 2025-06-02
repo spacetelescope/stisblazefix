@@ -4,37 +4,43 @@ on: [push, pull_request]
 
 jobs:
 
-  unit-tests:
-
+  build-test:
+    name: Test on ${{ matrix.os }} / Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.9", "3.10", "3.11"]
+        include:
+          - os: ubuntu-latest
+            python-version: "3.12"
+          - os: ubuntu-latest
+            python-version: "3.11"
+          - os: ubuntu-latest
+            python-version: "3.10"
+          - os: macos-latest
+            python-version: "3.12"
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: conda-incubator/setup-miniconda@v2
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          activate-environment: stisblazefix-env
-          environment-file: doc/environment.yml
-          auto-activate-base: false
-          auto-update-conda: true
           python-version: ${{ matrix.python-version }}
-          channels: conda-forge
-          allow-softlinks: true
-          channel-priority: flexible
-          show-channel-urls: true
-      - name: install package
-        shell: bash -l {0}
+          cache: pip
+
+      - name: Upgrade pip and install build tools
         run: |
-          pip install -e .
-      - name: conda info
-        shell: bash -l {0}
+          python -m pip install --upgrade pip setuptools wheel build
+
+      - name: Install package with test dependencies
         run: |
-          conda info
-          conda list
-      - name: Run stisblazefix unit tests
-        shell: bash -l {0}
+          pip install .[test]
+
+      - name: Print installed packages
+        run: |
+          pip list --format=columns
+
+      - name: Run tests
         run: |
           pytest stisblazefix/

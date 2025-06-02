@@ -1,11 +1,11 @@
-STIS echelle blaze function correction script
+STIS Echelle Blaze Function Correction Script
 =============================================
 
 Correction for the HST/STIS echelle blaze function.
 
 See documentation at https://stisblazefix.readthedocs.io
 
-|build-status| |coverage| |docs| |conda| |updated| 
+|build-status| |coverage| |docs|
 
 This module contains a variety of functions to correct the blaze function in HST STIS
 echelle modes. It is intended for use with STIS echelle x1d fits files.
@@ -42,11 +42,3 @@ Additional fixes by C. Proffitt Aug-Sep 2017
     :alt: Documentation Status
     :scale: 100%
     :target: http://stisblazefix.readthedocs.io/en/latest/?badge=latest
-
-.. |conda| image:: https://anaconda.org/sean-lockwood/stisblazefix/badges/installer/conda.svg
-    :alt: conda install
-    :target: https://anaconda.org/sean-lockwood/stisblazefix
-
-.. |updated| image:: https://anaconda.org/sean-lockwood/stisblazefix/badges/latest_release_date.svg
-    :alt: Last conda update
-    :target: https://anaconda.org/sean-lockwood/stisblazefix
