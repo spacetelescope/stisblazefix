@@ -18,6 +18,8 @@ stisblazefix Documentation
   :show-inheritance:
   :exclude-members: cliprange, genexplot, mkdqmask
 
+.. include:: simulation.rst
+
 Release History
 ---------------
 
