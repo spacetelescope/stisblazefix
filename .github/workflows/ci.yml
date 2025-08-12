@@ -1,6 +1,10 @@
 name: stisblazefix CI
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '50 13 * * 1'
 
 jobs:
 
