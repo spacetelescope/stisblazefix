@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@2e3e4b15a884dc73a63f962bff250a855150a234 # v6.0.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
